@@ -7,7 +7,7 @@
     
     <!-- 
       SECTION CSS 
-      Tout le style de l'application est ici.
+      Tout le style de l'application est ici, optimisé pour la réactivité.
     -->
     <style>
         /* Variables de couleur pour le Mode Clair */
@@ -29,7 +29,7 @@
             --btn-disabled-border: #c9c9c9;
             --purple: #6f42c1;
             --purple-dark: #4e2f89;
-            --grey-light: #f0f4f8; /* Pour les boutons de choix en mode clair */
+            --grey-light: #f0f4f8; 
         }
 
         /* Variables de couleur pour le Mode Sombre */
@@ -39,7 +39,7 @@
             --text-color: #f0f0f0;
             --text-secondary: #aaaaaa;
             --border-color: #333333;
-            --grey-light: #2c2c2c; /* Utilisé dans les boutons de choix */
+            --grey-light: #2c2c2c; 
 
             --btn-disabled-bg: #444444;
             --btn-disabled-border: #666666;
@@ -66,28 +66,28 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 20px;
+            padding: 10px 15px; /* Réduit le padding sur mobile */
             height: 50px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
             z-index: 100;
         }
         .stats-group {
             display: flex;
-            gap: 20px;
+            gap: 10px; /* Réduit l'espace entre les stats sur mobile */
         }
         .stat {
-            font-size: 1.2rem;
+            font-size: 1.1rem; /* Réduit la taille de police */
             font-weight: bold;
             color: var(--text-color);
             display: flex;
             align-items: center;
         }
         .stat span {
-            margin-left: 8px;
-            min-width: 20px;
+            margin-left: 5px;
+            min-width: 15px;
         }
         .stat-icon {
-            font-size: 1.5rem;
+            font-size: 1.3rem; /* Réduit la taille de l'icône */
         }
         .stat-icon-green { color: var(--green); }
         .stat-icon-red { color: var(--red); }
@@ -96,7 +96,7 @@
         /* Contrôles du Header (Mode Sombre et Admin) */
         .header-controls {
             display: flex;
-            gap: 10px;
+            gap: 5px; /* Réduit l'espace entre les boutons */
             align-items: center;
         }
         
@@ -104,12 +104,12 @@
             background: var(--bg-primary);
             color: var(--text-color);
             border: 2px solid var(--border-color);
-            padding: 5px 10px;
-            border-radius: 10px;
+            padding: 5px 8px; /* Réduit le padding */
+            border-radius: 8px; /* Légèrement plus petit */
             cursor: pointer;
-            font-size: 1rem;
+            font-size: 0.85rem; /* Réduit la taille de police */
             transition: background-color 0.2s, border-color 0.2s;
-            white-space: nowrap; /* Empêche le texte de se casser sur plusieurs lignes */
+            white-space: nowrap; 
         }
         #dark-mode-toggle:hover, #admin-unlock-btn:hover {
             background-color: var(--border-color);
@@ -121,26 +121,26 @@
 
         /* 2. Parcours d'apprentissage */
         .learning-path {
-            padding: 20px;
+            padding: 20px 10px;
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 15px;
         }
         .unit-container {
-            width: 100%;
+            width: 95%; /* Prend plus de largeur sur mobile */
             max-width: 400px;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             text-align: center;
         }
         .unit-title {
             background-color: var(--green);
             color: var(--bg-secondary);
-            padding: 10px;
-            border-radius: 12px;
-            font-size: 1.3rem;
+            padding: 8px;
+            border-radius: 10px;
+            font-size: 1.2rem;
             font-weight: bold;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
         .unit-container:nth-child(2) .unit-title { background-color: var(--blue); }
         .unit-container:nth-child(3) .unit-title { background-color: var(--red); }
@@ -149,50 +149,36 @@
 
 
         .lesson-node {
-            width: 70px;
-            height: 70px;
+            width: 60px; /* Plus petit sur mobile */
+            height: 60px;
             border-radius: 50%;
-            border: 6px solid;
+            border: 4px solid; /* Bordure plus fine */
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 2.5rem;
-            margin: 10px auto;
+            font-size: 2rem; /* Icône plus petite */
+            margin: 8px auto;
             position: relative;
         }
         
         /* Styles spécifiques au nœud de validation */
         .lesson-node.validation {
-            font-size: 2rem;
-            margin-top: 30px; /* Plus d'espace après la dernière leçon */
+            font-size: 1.8rem;
+            margin-top: 25px; 
             border-style: dashed;
         }
-        .lesson-node.validation.active {
-            background-color: var(--gold);
-            border-color: var(--gold-dark);
-            color: var(--bg-secondary);
-        }
-        .lesson-node.validation.locked {
-            border-color: #b0b0b0;
-            background-color: #d1d1d1;
-            color: #b0b0b0;
-        }
-        .lesson-node.validation.completed {
-            background-color: var(--purple);
-            border-color: var(--purple-dark);
-            color: var(--bg-secondary);
-        }
+        
         /* Style des lignes de connexion */
         .connector {
-            height: 30px;
-            width: 4px;
+            height: 25px;
+            width: 3px;
             background-color: var(--border-color);
-            margin: -5px auto;
+            margin: -4px auto;
             border-radius: 2px;
         }
         /* Style des lignes de connexion pour validation */
         .validation-connector {
-            height: 15px;
+            height: 10px;
             margin: 0 auto;
             background-color: transparent;
             border-left: 2px dashed var(--border-color);
@@ -200,7 +186,7 @@
         
         /* États des leçons standard */
         .lesson-node.locked {
-            background-color: var(--grey-light, #d1d1d1); /* Utilisé pour le bouton gris */
+            background-color: var(--grey-light, #d1d1d1); 
             border-color: #b0b0b0;
             color: #b0b0b0;
             cursor: not-allowed;
@@ -235,39 +221,40 @@
             z-index: 200;
             justify-content: center;
             align-items: center;
-            padding: 10px;
+            padding: 0; /* Pas de padding pour remplir tout l'écran sur mobile */
             box-sizing: border-box;
         }
         .lesson-content {
             background-color: var(--bg-secondary);
             color: var(--text-color);
-            border-radius: 15px;
+            border-radius: 0; /* Pas de bordure sur mobile pour prendre tout l'écran */
             width: 100%;
-            max-width: 500px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.25);
+            max-width: 100%;
+            height: 100%;
+            box-shadow: none; 
             display: flex;
             flex-direction: column;
-            max-height: 90vh;
+            max-height: 100vh;
             position: relative; 
             transition: background-color 0.3s;
         }
         #lesson-header {
-            padding: 20px;
+            padding: 15px; /* Réduit le padding du header */
             border-bottom: 2px solid var(--border-color);
         }
         #lesson-title {
             margin: 0;
-            font-size: 1.5rem;
+            font-size: 1.3rem; /* Titre plus petit */
             color: var(--text-color);
         }
         /* Bouton de fermeture */
         #close-lesson-btn {
             position: absolute;
-            top: 10px;
-            right: 10px;
+            top: 5px;
+            right: 5px;
             background: none;
             border: none;
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             cursor: pointer;
             color: var(--text-secondary);
             padding: 5px;
@@ -281,24 +268,25 @@
         #lesson-body-container {
             flex-grow: 1;
             overflow-y: auto;
-            padding: 0 25px;
+            padding: 0 15px; /* Réduit le padding du corps */
         }
 
         /* Contenu du cours/Explications */
         .course-explanation {
-            padding: 25px 0;
-            line-height: 1.6;
+            padding: 15px 0;
+            line-height: 1.5;
         }
         .course-explanation h3 {
             color: var(--green-dark);
             margin-top: 0;
-            font-size: 1.4rem;
+            font-size: 1.3rem;
         }
         body.dark-mode .course-explanation h3 {
             color: var(--green);
         }
         .course-explanation p {
-            margin-bottom: 15px;
+            margin-bottom: 10px;
+            font-size: 0.95rem; /* Texte légèrement plus petit */
             color: var(--text-secondary);
         }
         .course-explanation strong {
@@ -307,17 +295,17 @@
         .explanation-next-btn {
             display: block;
             width: 100%;
-            padding: 15px;
+            padding: 12px; /* Bouton plus compact */
             border: none;
-            border-radius: 12px;
-            font-size: 1.1rem;
+            border-radius: 10px;
+            font-size: 1rem;
             font-weight: bold;
             color: var(--bg-secondary);
             background-color: var(--blue);
-            border-bottom: 4px solid #0056b3;
+            border-bottom: 3px solid #0056b3; /* Bordure plus fine */
             cursor: pointer;
             transition: background-color 0.1s;
-            margin-top: 20px;
+            margin-top: 15px;
         }
         .explanation-next-btn:hover {
             background-color: #0069d9;
@@ -325,13 +313,13 @@
         
         /* Questions */
         #question-area {
-            display: none; /* Caché jusqu'à ce que l'explication soit lue */
-            padding: 25px 0;
+            display: none; 
+            padding: 15px 0;
         }
         #question-text {
-            font-size: 1.2rem;
+            font-size: 1.1rem; /* Texte de la question plus petit */
             font-weight: bold;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             color: var(--text-color);
         }
 
@@ -341,15 +329,15 @@
         .choice-button {
             display: block;
             width: 100%;
-            padding: 15px;
-            margin: 10px 0;
+            padding: 12px; /* Bouton QCM plus compact */
+            margin: 8px 0;
             background-color: var(--grey-light);
             border: 2px solid var(--border-color);
-            border-bottom-width: 4px;
-            border-radius: 12px;
+            border-bottom-width: 3px;
+            border-radius: 10px;
             cursor: pointer;
             text-align: left;
-            font-size: 1rem;
+            font-size: 0.95rem;
             font-weight: bold;
             transition: all 0.1s ease;
             color: var(--text-color);
@@ -361,7 +349,7 @@
         .choice-button.selected {
             background-color: var(--blue-light);
             border: 2px solid var(--blue);
-            border-bottom-width: 4px;
+            border-bottom-width: 3px;
         }
         .choice-button:disabled {
             cursor: not-allowed;
@@ -372,10 +360,10 @@
         .input-answer {
             display: block;
             width: 100%;
-            padding: 15px;
-            margin-top: 20px;
+            padding: 12px;
+            margin-top: 15px;
             border: 2px solid var(--border-color);
-            border-radius: 12px;
+            border-radius: 10px;
             font-size: 1rem;
             box-sizing: border-box; 
             background-color: var(--bg-secondary);
@@ -401,10 +389,10 @@
 
         /* 5. Footer de Feedback */
         .feedback-footer {
-            padding: 20px;
+            padding: 15px; /* Réduit le padding du footer */
             background-color: var(--grey-light);
             border-top: 2px solid var(--border-color);
-            border-radius: 0 0 15px 15px;
+            border-radius: 0; /* Pas de bordure sur mobile */
             transition: background-color 0.3s ease;
         }
         .feedback-footer.correct {
@@ -417,9 +405,9 @@
         body.dark-mode .feedback-footer.incorrect { background-color: #4d0000; }
         
         #feedback-message {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-weight: bold;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
         #feedback-message.correct { color: var(--green-dark); }
         #feedback-message.incorrect { color: var(--red); }
@@ -428,32 +416,21 @@
         .footer-btn {
             display: block;
             width: 100%;
-            padding: 15px;
+            padding: 12px;
             border: none;
-            border-radius: 12px;
-            font-size: 1.1rem;
+            border-radius: 10px;
+            font-size: 1rem;
             font-weight: bold;
             color: var(--bg-secondary);
             cursor: pointer;
-            border-bottom-width: 4px;
+            border-bottom-width: 3px;
             border-bottom-style: solid;
             transition: all 0.1s ease;
         }
         .footer-btn:not(:disabled):hover {
             filter: brightness(1.05);
         }
-        /* Style amélioré pour le bouton désactivé/Vérifier */
-        .footer-btn#check-answer-btn {
-            background-color: var(--btn-disabled-bg); 
-            border-color: var(--btn-disabled-border);
-            color: var(--text-secondary); 
-        }
-        .footer-btn#check-answer-btn:disabled {
-            background-color: var(--btn-disabled-bg);
-            border-color: var(--btn-disabled-border);
-            cursor: not-allowed;
-            color: var(--text-secondary);
-        }
+        
         /* Style pour le bouton vérifier ACTIF */
         .footer-btn#check-answer-btn:not(:disabled) {
             background-color: var(--green);
@@ -469,22 +446,120 @@
             background-color: var(--red);
             border-color: #b02121;
         }
-        
-        /* Styles de feedback sur les choix QCM */
-        .choice-button.correct {
-            background-color: #d7ffb8;
-            border-color: var(--green);
-            color: var(--green-dark);
-        }
-        .choice-button.incorrect {
-            background-color: #ffe2e2;
-            border-color: var(--red);
-            color: var(--red);
-        }
-        body.dark-mode .choice-button.correct { background-color: #213c00; color: #b8ffb8; }
-        body.dark-mode .choice-button.incorrect { background-color: #4d0000; color: #ffb8b8; }
-        body.dark-mode .choice-button.selected { background-color: #003774; border-color: var(--blue); }
 
+        /* ---------------------------------------------------- */
+        /* MEDIA QUERIES pour les grands écrans (tablette et desktop) */
+        /* ---------------------------------------------------- */
+        @media (min-width: 600px) {
+            body {
+                padding-top: 80px;
+            }
+
+            .top-bar {
+                padding: 10px 30px;
+                height: 60px;
+            }
+
+            .stats-group {
+                gap: 20px;
+            }
+
+            .stat {
+                font-size: 1.2rem;
+            }
+            .stat span {
+                margin-left: 8px;
+                min-width: 20px;
+            }
+            .stat-icon {
+                font-size: 1.5rem;
+            }
+
+            #dark-mode-toggle, #admin-unlock-btn {
+                padding: 8px 15px;
+                font-size: 1rem;
+                border-radius: 10px;
+            }
+            
+            .learning-path {
+                padding: 30px 20px;
+            }
+
+            /* Augmentation de la taille des noeuds sur desktop */
+            .lesson-node {
+                width: 70px;
+                height: 70px;
+                border: 6px solid;
+                font-size: 2.5rem;
+                margin: 10px auto;
+            }
+            .connector {
+                height: 30px;
+                width: 4px;
+                margin: -5px auto;
+            }
+            .lesson-node.validation {
+                font-size: 2rem;
+            }
+            
+            /* Modal de leçon centré sur desktop */
+            .lesson-content {
+                border-radius: 15px;
+                width: 90%;
+                max-width: 500px;
+                height: auto;
+                max-height: 90vh;
+                box-shadow: 0 5px 20px rgba(0,0,0,0.25);
+            }
+
+            #lesson-header {
+                padding: 20px;
+            }
+            #lesson-title {
+                font-size: 1.5rem;
+            }
+            
+            #close-lesson-btn {
+                top: 10px;
+                right: 10px;
+                font-size: 1.5rem;
+            }
+
+            #lesson-body-container {
+                padding: 0 25px;
+            }
+
+            .course-explanation {
+                padding: 25px 0;
+            }
+            .course-explanation h3 {
+                font-size: 1.4rem;
+            }
+            .course-explanation p {
+                font-size: 1rem;
+            }
+
+            .explanation-next-btn, .footer-btn, .choice-button {
+                padding: 15px;
+                font-size: 1.1rem;
+                border-radius: 12px;
+            }
+            .explanation-next-btn, .footer-btn {
+                border-bottom-width: 4px;
+            }
+            .choice-button {
+                border-bottom-width: 4px;
+            }
+
+            .feedback-footer {
+                padding: 20px;
+                border-radius: 0 0 15px 15px;
+            }
+            
+            #feedback-message {
+                font-size: 1.2rem;
+            }
+        }
     </style>
 </head>
 <body class="light-mode">
@@ -536,6 +611,7 @@
     <!-- 
       SECTION JAVASCRIPT
       Toute la logique de l'application est ici.
+      (Même code JS que la version précédente pour maintenir la fonctionnalité de répétition)
     -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -625,7 +701,6 @@
                                 <p>L'<strong>Analyse Technique (AT)</strong> est l'étude des mouvements de prix passés et des volumes de transaction pour tenter de prédire les mouvements futurs. Le principe clé est que "l'histoire se répète".</p>
                                 <p>L'AT utilise divers outils, comme les <strong>moyennes mobiles</strong> (qui lissent les données de prix pour identifier la direction de la tendance), les lignes de support et de résistance, et les modèles graphiques.</p>
                                 <p>Contrairement à l'Analyse Fondamentale, l'AT ne s'intéresse pas à la valeur réelle de l'entreprise (les bénéfices, les dettes, etc.), mais uniquement à l'action du marché lui-même.</p>
-                                
                             `,
                             questions: [
                                 { type: 'mcq', text: "L'analyse technique se base principalement sur...", choices: ["Les rapports financiers de l'entreprise", "Les graphiques de prix et les volumes de transaction", "Les articles de presse économique", "Les émotions du trader"], answer: "Les graphiques de prix et les volumes de transaction" },
@@ -662,7 +737,6 @@
                                     <li>Un chandelier <strong>vert (ou blanc)</strong> signifie que le prix a clôturé plus haut qu'il n'a ouvert (tendance haussière).</li>
                                     <li>Un chandelier <strong>rouge (ou noir)</strong> signifie que le prix a clôturé plus bas qu'il n'a ouvert (tendance baissière).</li>
                                 </ul>
-                                
                             `,
                             questions: [
                                 { type: 'mcq', text: "Sur un chandelier vert, où se trouve le prix de clôture par rapport au prix d'ouverture ?", choices: ["En dessous", "Au-dessus", "Au même niveau", "Impossible à dire"], answer: "Au-dessus" },
@@ -1363,11 +1437,11 @@
                 lessonBodyContainerEl.innerHTML = `
                     <div style="padding: 25px;">
                         <h2 style="text-align: center; color: ${isSuccess ? 'var(--green)' : 'var(--red)'}; margin-bottom: 20px;">${isSuccess ? 'Félicitations !' : 'À Réviser !'}</h2>
-                        <p style="text-align: center; font-size: 1.2rem; font-weight: bold; padding: 15px; border-radius: 8px; background-color: var(--grey-light);">${summaryMessage}</p>
+                        <p id="feedback-final-message" style="text-align: center; font-size: 1.2rem; font-weight: bold; padding: 15px; border-radius: 8px; background-color: var(--grey-light);">${summaryMessage}</p>
                     </div>
                 `;
                 feedbackFooterEl.className = 'feedback-footer ' + (isSuccess ? 'correct' : 'incorrect');
-                feedbackFooterEl.innerHTML = `<button id="close-modal-btn" class="footer-btn ${btnClass}">${nextAction}</button>`;
+                feedbackFooterEl.innerHTML = `<button id="close-modal-btn" class="footer-btn ${btnClass}">Continuer vers le parcours</button>`;
                 document.getElementById('close-modal-btn').addEventListener('click', closeLesson);
                 
                 updateStatsUI();
