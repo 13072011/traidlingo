@@ -1,0 +1,1573 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TradeLingo - Apprenez le Trading</title>
+    
+    <!-- 
+      SECTION CSS 
+      Tout le style de l'application est ici.
+    -->
+    <style>
+        /* Variables de couleur pour le Mode Clair */
+        :root {
+            --bg-primary: #f0f4f8;
+            --bg-secondary: #ffffff;
+            --text-color: #333;
+            --text-secondary: #666;
+            --border-color: #e5e5e5;
+
+            --green: #58a700;
+            --green-dark: #468400;
+            --red: #ea2b2b;
+            --blue: #007bff;
+            --blue-light: #d7eaff;
+            --gold: #ffc107;
+            --gold-dark: #c79100;
+            --btn-disabled-bg: #e0e0e0;
+            --btn-disabled-border: #c9c9c9;
+            --purple: #6f42c1;
+            --purple-dark: #4e2f89;
+            --grey-light: #f0f4f8; /* Pour les boutons de choix en mode clair */
+        }
+
+        /* Variables de couleur pour le Mode Sombre */
+        body.dark-mode {
+            --bg-primary: #121212;
+            --bg-secondary: #1e1e1e;
+            --text-color: #f0f0f0;
+            --text-secondary: #aaaaaa;
+            --border-color: #333333;
+            --grey-light: #2c2c2c; /* Utilisé dans les boutons de choix */
+
+            --btn-disabled-bg: #444444;
+            --btn-disabled-border: #666666;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-primary);
+            margin: 0;
+            padding-top: 70px; /* Espace pour le header fixe */
+            padding-bottom: 20px;
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* 1. Header (Barre de stats + Mode Sombre) */
+        .top-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--bg-secondary);
+            border-bottom: 2px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            height: 50px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            z-index: 100;
+        }
+        .stats-group {
+            display: flex;
+            gap: 20px;
+        }
+        .stat {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+        }
+        .stat span {
+            margin-left: 8px;
+            min-width: 20px;
+        }
+        .stat-icon {
+            font-size: 1.5rem;
+        }
+        .stat-icon-green { color: var(--green); }
+        .stat-icon-red { color: var(--red); }
+        .stat-icon-blue { color: var(--blue); }
+
+        /* Contrôles du Header (Mode Sombre et Admin) */
+        .header-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        #dark-mode-toggle, #admin-unlock-btn {
+            background: var(--bg-primary);
+            color: var(--text-color);
+            border: 2px solid var(--border-color);
+            padding: 5px 10px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.2s, border-color 0.2s;
+            white-space: nowrap; /* Empêche le texte de se casser sur plusieurs lignes */
+        }
+        #dark-mode-toggle:hover, #admin-unlock-btn:hover {
+            background-color: var(--border-color);
+        }
+        #admin-unlock-btn {
+            color: var(--purple);
+            border-color: var(--purple-dark);
+        }
+
+        /* 2. Parcours d'apprentissage */
+        .learning-path {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+        .unit-container {
+            width: 100%;
+            max-width: 400px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .unit-title {
+            background-color: var(--green);
+            color: var(--bg-secondary);
+            padding: 10px;
+            border-radius: 12px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 25px;
+        }
+        .unit-container:nth-child(2) .unit-title { background-color: var(--blue); }
+        .unit-container:nth-child(3) .unit-title { background-color: var(--red); }
+        .unit-container:nth-child(4) .unit-title { background-color: var(--purple); }
+        .unit-container:nth-child(5) .unit-title { background-color: var(--gold-dark); }
+
+
+        .lesson-node {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            border: 6px solid;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            margin: 10px auto;
+            position: relative;
+        }
+        
+        /* Styles spécifiques au nœud de validation */
+        .lesson-node.validation {
+            font-size: 2rem;
+            margin-top: 30px; /* Plus d'espace après la dernière leçon */
+            border-style: dashed;
+        }
+        .lesson-node.validation.active {
+            background-color: var(--gold);
+            border-color: var(--gold-dark);
+            color: var(--bg-secondary);
+        }
+        .lesson-node.validation.locked {
+            border-color: #b0b0b0;
+            background-color: #d1d1d1;
+            color: #b0b0b0;
+        }
+        .lesson-node.validation.completed {
+            background-color: var(--purple);
+            border-color: var(--purple-dark);
+            color: var(--bg-secondary);
+        }
+        /* Style des lignes de connexion */
+        .connector {
+            height: 30px;
+            width: 4px;
+            background-color: var(--border-color);
+            margin: -5px auto;
+            border-radius: 2px;
+        }
+        /* Style des lignes de connexion pour validation */
+        .validation-connector {
+            height: 15px;
+            margin: 0 auto;
+            background-color: transparent;
+            border-left: 2px dashed var(--border-color);
+        }
+        
+        /* États des leçons standard */
+        .lesson-node.locked {
+            background-color: var(--grey-light, #d1d1d1); /* Utilisé pour le bouton gris */
+            border-color: #b0b0b0;
+            color: #b0b0b0;
+            cursor: not-allowed;
+        }
+        .lesson-node.active, .lesson-node.completed, .lesson-node.validation.active {
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        .lesson-node.active:hover, .lesson-node.completed:hover, .lesson-node.validation.active:hover {
+            transform: scale(1.05);
+        }
+        .lesson-node.active {
+            background-color: var(--green);
+            border-color: var(--green-dark);
+            color: var(--bg-secondary);
+        }
+        .lesson-node.completed {
+            background-color: var(--gold);
+            border-color: var(--gold-dark);
+            color: var(--bg-secondary);
+        }
+
+        /* 3. Modal de Leçon (caché) */
+        .lesson-modal {
+            display: none; 
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            z-index: 200;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+        .lesson-content {
+            background-color: var(--bg-secondary);
+            color: var(--text-color);
+            border-radius: 15px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.25);
+            display: flex;
+            flex-direction: column;
+            max-height: 90vh;
+            position: relative; 
+            transition: background-color 0.3s;
+        }
+        #lesson-header {
+            padding: 20px;
+            border-bottom: 2px solid var(--border-color);
+        }
+        #lesson-title {
+            margin: 0;
+            font-size: 1.5rem;
+            color: var(--text-color);
+        }
+        /* Bouton de fermeture */
+        #close-lesson-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+            padding: 5px;
+            transition: color 0.2s;
+            line-height: 1;
+        }
+        #close-lesson-btn:hover {
+            color: var(--red);
+        }
+
+        #lesson-body-container {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 0 25px;
+        }
+
+        /* Contenu du cours/Explications */
+        .course-explanation {
+            padding: 25px 0;
+            line-height: 1.6;
+        }
+        .course-explanation h3 {
+            color: var(--green-dark);
+            margin-top: 0;
+            font-size: 1.4rem;
+        }
+        body.dark-mode .course-explanation h3 {
+            color: var(--green);
+        }
+        .course-explanation p {
+            margin-bottom: 15px;
+            color: var(--text-secondary);
+        }
+        .course-explanation strong {
+            color: var(--text-color);
+        }
+        .explanation-next-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--bg-secondary);
+            background-color: var(--blue);
+            border-bottom: 4px solid #0056b3;
+            cursor: pointer;
+            transition: background-color 0.1s;
+            margin-top: 20px;
+        }
+        .explanation-next-btn:hover {
+            background-color: #0069d9;
+        }
+        
+        /* Questions */
+        #question-area {
+            display: none; /* Caché jusqu'à ce que l'explication soit lue */
+            padding: 25px 0;
+        }
+        #question-text {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: var(--text-color);
+        }
+
+        /* 4. Types de Questions */
+        
+        /* QCM */
+        .choice-button {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            background-color: var(--grey-light);
+            border: 2px solid var(--border-color);
+            border-bottom-width: 4px;
+            border-radius: 12px;
+            cursor: pointer;
+            text-align: left;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: all 0.1s ease;
+            color: var(--text-color);
+        }
+        .choice-button:not(:disabled):hover {
+            background-color: var(--border-color);
+        }
+        /* Style amélioré pour la sélection */
+        .choice-button.selected {
+            background-color: var(--blue-light);
+            border: 2px solid var(--blue);
+            border-bottom-width: 4px;
+        }
+        .choice-button:disabled {
+            cursor: not-allowed;
+            opacity: 0.8;
+        }
+        
+        /* Champ de texte */
+        .input-answer {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            margin-top: 20px;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            font-size: 1rem;
+            box-sizing: border-box; 
+            background-color: var(--bg-secondary);
+            color: var(--text-color);
+        }
+        .input-answer.correct {
+            border-color: var(--green);
+            background-color: #d7ffb8;
+        }
+        .input-answer.incorrect {
+            border-color: var(--red);
+            background-color: #ffe2e2;
+        }
+        body.dark-mode .input-answer.correct {
+            background-color: #213c00; 
+            color: var(--text-color);
+        }
+        body.dark-mode .input-answer.incorrect {
+            background-color: #4d0000;
+            color: var(--text-color);
+        }
+
+
+        /* 5. Footer de Feedback */
+        .feedback-footer {
+            padding: 20px;
+            background-color: var(--grey-light);
+            border-top: 2px solid var(--border-color);
+            border-radius: 0 0 15px 15px;
+            transition: background-color 0.3s ease;
+        }
+        .feedback-footer.correct {
+            background-color: #d7ffb8; 
+        }
+        .feedback-footer.incorrect {
+            background-color: #ffe2e2; 
+        }
+        body.dark-mode .feedback-footer.correct { background-color: #213c00; }
+        body.dark-mode .feedback-footer.incorrect { background-color: #4d0000; }
+        
+        #feedback-message {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        #feedback-message.correct { color: var(--green-dark); }
+        #feedback-message.incorrect { color: var(--red); }
+        
+        /* Styles des boutons du footer */
+        .footer-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--bg-secondary);
+            cursor: pointer;
+            border-bottom-width: 4px;
+            border-bottom-style: solid;
+            transition: all 0.1s ease;
+        }
+        .footer-btn:not(:disabled):hover {
+            filter: brightness(1.05);
+        }
+        /* Style amélioré pour le bouton désactivé/Vérifier */
+        .footer-btn#check-answer-btn {
+            background-color: var(--btn-disabled-bg); 
+            border-color: var(--btn-disabled-border);
+            color: var(--text-secondary); 
+        }
+        .footer-btn#check-answer-btn:disabled {
+            background-color: var(--btn-disabled-bg);
+            border-color: var(--btn-disabled-border);
+            cursor: not-allowed;
+            color: var(--text-secondary);
+        }
+        /* Style pour le bouton vérifier ACTIF */
+        .footer-btn#check-answer-btn:not(:disabled) {
+            background-color: var(--green);
+            border-color: var(--green-dark);
+            color: var(--bg-secondary);
+        }
+
+        .footer-btn.correct-btn {
+            background-color: var(--green);
+            border-color: var(--green-dark);
+        }
+        .footer-btn.incorrect-btn {
+            background-color: var(--red);
+            border-color: #b02121;
+        }
+        
+        /* Styles de feedback sur les choix QCM */
+        .choice-button.correct {
+            background-color: #d7ffb8;
+            border-color: var(--green);
+            color: var(--green-dark);
+        }
+        .choice-button.incorrect {
+            background-color: #ffe2e2;
+            border-color: var(--red);
+            color: var(--red);
+        }
+        body.dark-mode .choice-button.correct { background-color: #213c00; color: #b8ffb8; }
+        body.dark-mode .choice-button.incorrect { background-color: #4d0000; color: #ffb8b8; }
+        body.dark-mode .choice-button.selected { background-color: #003774; border-color: var(--blue); }
+
+    </style>
+</head>
+<body class="light-mode">
+
+    <!-- 1. Le Header : pour les stats de l'utilisateur -->
+    <header class="top-bar">
+        <div class="stats-group">
+            <div class="stat">
+                <span class="stat-icon stat-icon-green">🔥</span>
+                <span id="streak-count">0</span>
+            </div>
+            <div class="stat">
+                <span class="stat-icon stat-icon-blue">💎</span>
+                <span id="gem-count">100</span>
+            </div>
+            <div class="stat">
+                <span class="stat-icon stat-icon-red">❤️</span>
+                <span id="life-count">5</span>
+            </div>
+        </div>
+        <!-- Contrôles du Header (Mode Admin et Sombre) -->
+        <div class="header-controls">
+            <button id="admin-unlock-btn" title="Débloquer toutes les leçons (Mode Dev)">🔓 Débloquer Tout</button>
+            <button id="dark-mode-toggle" title="Basculer le thème">🌙 Mode Sombre</button>
+        </div>
+    </header>
+
+    <!-- 2. Le Parcours d'Apprentissage -->
+    <main class="learning-path" id="learning-path">
+        <!-- Le parcours (unités et leçons) sera généré par JavaScript ici -->
+    </main>
+
+    <!-- 3. Le Modal de Leçon (caché par défaut) -->
+    <div class="lesson-modal" id="lesson-modal">
+        <div class="lesson-content">
+            <button id="close-lesson-btn" title="Fermer la leçon">✕</button>
+            <header id="lesson-header">
+                <h2 id="lesson-title">Titre de la leçon</h2>
+            </header>
+            <div id="lesson-body-container">
+                <!-- Contient l'explication et la zone de questions -->
+            </div>
+            <footer class="feedback-footer" id="feedback-footer">
+                <!-- Boutons de vérification/continuation -->
+            </footer>
+        </div>
+    </div>
+
+    <!-- 
+      SECTION JAVASCRIPT
+      Toute la logique de l'application est ici.
+    -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // --- Constantes pour l'achat de vies ---
+            const LIFE_MAX = 5;
+            const LIFE_PACK_COST = 100;
+            const LIFE_PACK_AMOUNT = 5;
+            const QUESTIONS_PER_VALIDATION = 5; // Nombre de questions pour le test de validation
+            const FIRST_LESSON_ID = 'bases-1'; // La première leçon qui doit toujours être 'active'
+
+            // --- 1. Base de Données des Cours ---
+            const courseContent = {
+                'unit-1': {
+                    title: "Unité 1 : Les Bases du Marché",
+                    lessons: {
+                        'bases-1': {
+                            icon: '📈',
+                            title: "Qu'est-ce qu'une action ?",
+                            type: 'standard',
+                            content: `
+                                <h3>Introduction aux Actions</h3>
+                                <p>Une <strong>action</strong> est une part de propriété d'une entreprise. En achetant une action, vous devenez actionnaire et vous possédez une petite fraction de cette société.</p>
+                                <p>Le marché où s'échangent ces actions est appelé la <strong>Bourse</strong>. Les entreprises vendent des actions pour lever des capitaux et financer leur croissance. Si l'entreprise fait des bénéfices, elle peut verser des <strong>dividendes</strong> à ses actionnaires.</p>
+                                <p>Le prix d'une action fluctue en fonction de l'offre et de la demande, influencé par la performance de l'entreprise et les attentes du marché.</p>
+                            `,
+                            questions: [
+                                { type: 'mcq', text: "Qu'est-ce qu'une action représente ?", choices: ["Une dette de l'entreprise", "Une part de propriété de l'entreprise", "Un prêt à l'entreprise", "Le salaire du PDG"], answer: "Une part de propriété de l'entreprise" },
+                                { type: 'mcq', text: "Où s'achètent et se vendent principalement les actions ?", choices: ["À la banque", "Sur le marché boursier (Bourse)", "Directement auprès de l'entreprise", "Dans un centre commercial"], answer: "Sur le marché boursier (Bourse)" },
+                                { type: 'input', text: "Si une entreprise réalise un bénéfice, qu'est-ce qu'elle peut verser à ses actionnaires ?", answer: "Dividende" }
+                            ]
+                        },
+                        'bases-2': {
+                            icon: '🏛️',
+                            title: "Ordres de Bourse",
+                            type: 'standard',
+                            content: `
+                                <h3>Les Types d'Ordres</h3>
+                                <p>Il existe deux ordres de base pour acheter ou vendre des titres :</p>
+                                <ul>
+                                    <li><strong>L'Ordre au Marché (Market Order) :</strong> Il est exécuté immédiatement au meilleur prix disponible actuel. Il garantit l'exécution, mais pas le prix exact.</li>
+                                    <li><strong>L'Ordre Limite (Limit Order) :</strong> Il fixe un prix maximum d'achat ou un prix minimum de vente. Il garantit le prix, mais pas l'exécution (si le prix n'est jamais atteint).</li>
+                                </ul>
+                                <p>La compréhension de ces ordres est fondamentale pour contrôler le prix auquel vous entrez ou sortez du marché.</p>
+                            `,
+                            questions: [
+                                { type: 'mcq', text: "Un ordre 'au marché' (market order) garantit...", choices: ["Un prix spécifique", "L'exécution rapide de l'ordre", "Un profit certain", "Une annulation facile"], answer: "L'exécution rapide de l'ordre" },
+                                { type: 'mcq', text: "Lequel des ordres suivants ne sera exécuté que si le prix atteint ou dépasse un niveau que vous avez spécifié ?", choices: ["Ordre au marché", "Ordre à cours limité", "Ordre d'achat immédiat", "Ordre de régulation"], answer: "Ordre à cours limité" },
+                                { type: 'input', text: "Comment appelle-t-on un ordre qui fixe un prix maximum pour acheter, ou un prix minimum pour vendre ?", answer: "Ordre limite" }
+                            ]
+                        },
+                        'bases-3': {
+                            icon: '💧',
+                            title: "Le Volume de Trading",
+                            type: 'standard',
+                            content: `
+                                <h3>Comprendre le Volume</h3>
+                                <p>Le <strong>volume de trading</strong> est le nombre total d'unités (actions, contrats, etc.) qui ont été échangées pendant une période donnée (par exemple, un jour).</p>
+                                <p>Il est crucial car il mesure la <strong>force</strong> d'un mouvement de prix. Si un prix monte avec un volume élevé, cela indique une forte conviction des acheteurs. Si un prix monte avec un volume faible, le mouvement est considéré comme faible et potentiellement éphémère.</p>
+                                <p>Un pic de volume signale souvent l'arrivée de grandes institutions ou la fin d'un mouvement important.</p>
+                            `,
+                            questions: [
+                                { type: 'mcq', text: "Le volume de trading mesure...", choices: ["La vitesse à laquelle le prix change", "Le nombre total d'actions échangées", "Le prix moyen sur 30 jours", "La taille de l'entreprise"], answer: "Le nombre total d'actions échangées" },
+                                { type: 'mcq', text: "Que signifie une forte hausse de prix accompagnée d'un volume faible ?", choices: ["C'est un signal d'achat très fort", "Le mouvement est peu fiable et pourrait s'inverser rapidement", "Les actions sont en pénurie", "Le marché est fermé"], answer: "Le mouvement est peu fiable et pourrait s'inverser rapidement" },
+                                { type: 'input', text: "Si le prix d'une action augmente avec un volume élevé, cela indique une tendance ________ ?", answer: "Forte" }
+                            ]
+                        },
+                        'validation-1': {
+                            icon: '⭐',
+                            title: "Validation : Bases du Marché",
+                            type: 'validation',
+                            unitToValidate: 'unit-1', // L'unité à partir de laquelle tirer les questions
+                            passRate: 0.8, // Exigence de réussite (80% minimum)
+                            questions: [] // Questions générées dynamiquement
+                        }
+                    }
+                },
+                'unit-2': {
+                    title: "Unité 2 : Analyse",
+                    lessons: {
+                        'analyse-1': {
+                            icon: '📊',
+                            title: "Analyse Technique",
+                            type: 'standard',
+                            content: `
+                                <h3>Principes de l'Analyse Technique</h3>
+                                <p>L'<strong>Analyse Technique (AT)</strong> est l'étude des mouvements de prix passés et des volumes de transaction pour tenter de prédire les mouvements futurs. Le principe clé est que "l'histoire se répète".</p>
+                                <p>L'AT utilise divers outils, comme les <strong>moyennes mobiles</strong> (qui lissent les données de prix pour identifier la direction de la tendance), les lignes de support et de résistance, et les modèles graphiques.</p>
+                                <p>Contrairement à l'Analyse Fondamentale, l'AT ne s'intéresse pas à la valeur réelle de l'entreprise (les bénéfices, les dettes, etc.), mais uniquement à l'action du marché lui-même.</p>
+                                
+                            `,
+                            questions: [
+                                { type: 'mcq', text: "L'analyse technique se base principalement sur...", choices: ["Les rapports financiers de l'entreprise", "Les graphiques de prix et les volumes de transaction", "Les articles de presse économique", "Les émotions du trader"], answer: "Les graphiques de prix et les volumes de transaction" },
+                                { type: 'mcq', text: "Quel est l'un des principes fondamentaux de l'Analyse Technique ?", choices: ["Les bilans comptables sont la seule vérité", "Le prix intègre toute l'information (Tout est déjà 'pricé')", "L'économie est imprévisible", "Le futur est toujours différent du passé"], answer: "Le prix intègre toute l'information (Tout est déjà 'pricé')" },
+                                { type: 'input', text: "Quel indicateur de tendance utilise la moyenne des prix sur une période donnée (ex: 50 jours) ?", answer: "Moyenne mobile" }
+                            ]
+                        },
+                        'analyse-2': {
+                            icon: '🔬',
+                            title: "Analyse Fondamentale",
+                            type: 'standard',
+                            content: `
+                                <h3>Principes de l'Analyse Fondamentale</h3>
+                                <p>L'<strong>Analyse Fondamentale (AF)</strong> est la méthode qui évalue la <strong>valeur intrinsèque</strong> d'un actif (comme une action) en examinant les facteurs économiques, financiers et autres facteurs qualitatifs et quantitatifs connexes.</p>
+                                <p>Pour les actions, cela inclut l'étude des bilans, des comptes de résultats, des flux de trésorerie, et de la santé du secteur. L'objectif est de trouver des titres sous-évalués (acheter) ou surévalués (vendre).</p>
+                                <p>L'AF est privilégiée par les investisseurs à long terme, comme Warren Buffett.</p>
+                            `,
+                            questions: [
+                                { type: 'mcq', text: "L'analyse fondamentale évalue...", choices: ["L'historique des transactions passées", "La valeur intrinsèque d'une entreprise", "Le niveau de la mer", "Les opinions des autres traders"], answer: "La valeur intrinsèque d'une entreprise" },
+                                { type: 'mcq', text: "Quels documents d'une entreprise sont essentiels à l'Analyse Fondamentale ?", choices: ["Les rapports météorologiques", "Les jeux vidéo les plus vendus", "Les états financiers (bilan, compte de résultat)", "Les tendances mode"], answer: "Les états financiers (bilan, compte de résultat)" },
+                                { type: 'input', text: "Quel terme désigne le montant total qu'une entreprise doit à des tiers (ce qui est étudié en AF) ?", answer: "Dette" }
+                            ]
+                        },
+                        'analyse-3': {
+                            icon: '🕯️',
+                            title: "Les Chandeliers Japonais",
+                            type: 'standard',
+                            content: `
+                                <h3>Introduction aux Chandeliers</h3>
+                                <p>Les <strong>chandeliers japonais</strong> sont la méthode la plus populaire pour représenter le mouvement du prix sur un graphique. Chaque chandelier représente l'activité de trading pendant une période donnée (par exemple, 1 jour, 1 heure).</p>
+                                <ul>
+                                    <li>Le <strong>corps</strong> (la partie épaisse) montre la distance entre le prix d'ouverture et de clôture.</li>
+                                    <li>Les <strong>mèches</strong> (les lignes fines) montrent le prix le plus haut et le prix le plus bas atteint.</li>
+                                    <li>Un chandelier <strong>vert (ou blanc)</strong> signifie que le prix a clôturé plus haut qu'il n'a ouvert (tendance haussière).</li>
+                                    <li>Un chandelier <strong>rouge (ou noir)</strong> signifie que le prix a clôturé plus bas qu'il n'a ouvert (tendance baissière).</li>
+                                </ul>
+                                
+                            `,
+                            questions: [
+                                { type: 'mcq', text: "Sur un chandelier vert, où se trouve le prix de clôture par rapport au prix d'ouverture ?", choices: ["En dessous", "Au-dessus", "Au même niveau", "Impossible à dire"], answer: "Au-dessus" },
+                                { type: 'mcq', text: "Que représentent les 'mèches' d'un chandelier ?", choices: ["Le volume de trading", "Le prix d'ouverture et de clôture", "Le prix le plus haut et le plus bas de la période", "La tendance future"], answer: "Le prix le plus haut et le plus bas de la période" },
+                                { type: 'input', text: "Comment appelle-t-on le point le plus haut atteint par le prix pendant la période du chandelier ?", answer: "Mèche supérieure" }
+                            ]
+                        },
+                        'validation-2': {
+                            icon: '⭐',
+                            title: "Validation : Analyse",
+                            type: 'validation',
+                            unitToValidate: 'unit-2',
+                            passRate: 0.8,
+                            questions: []
+                        }
+                    }
+                },
+                'unit-3': {
+                    title: "Unité 3 : Gestion des Risques",
+                    lessons: {
+                        'risque-1': {
+                            icon: '🛡️',
+                            title: "Le 'Stop Loss'",
+                            type: 'standard',
+                            content: `
+                                <h3>Le Stop Loss (Arrêt de Perte)</h3>
+                                <p>Le <strong>Stop Loss</strong> est un ordre qui vous permet de vendre automatiquement un titre si son prix tombe à un niveau prédéfini. C'est l'outil le plus important pour la gestion des risques.</p>
+                                <p>Son objectif principal est de <strong>limiter les pertes potentielles</strong>. En définissant votre Stop Loss avant d'entrer dans un trade, vous savez exactement quel est votre risque maximal sur cette position.</p>
+                                <p>Un Stop Loss peut être ajusté pour se rapprocher du prix du marché à mesure que le trade devient rentable (on parle alors de 'trailing stop').</p>
+                            `,
+                            questions: [
+                                { type: 'mcq', text: "Quel est l'objectif principal d'un ordre 'Stop Loss' ?", choices: ["Garantir un profit minimum", "Limiter les pertes potentielles", "Acheter plus d'actions automatiquement", "Vendre à un prix illimité"], answer: "Limiter les pertes potentielles" },
+                                { type: 'mcq', text: "Quand est-il idéal de placer un ordre Stop Loss ?", choices: ["Après avoir fait un gros profit", "Quelques jours après avoir ouvert le trade", "Avant même d'ouvrir la position", "Jamais, c'est pour les débutants"], answer: "Avant même d'ouvrir la position" },
+                                { type: 'input', text: "En utilisant le Stop Loss, quel paramètre contrôlez-vous avant de faire un trade ?", answer: "Risque" }
+                            ]
+                        },
+                        'risque-2': {
+                            icon: '⚖️',
+                            title: "La Diversification",
+                            type: 'standard',
+                            content: `
+                                <h3>Le Pouvoir de la Diversification</h3>
+                                <p>La <strong>diversification</strong> est la stratégie de répartition de votre capital sur différents actifs, secteurs ou marchés. L'idée est simple : si une partie de votre portefeuille sous-performe, une autre peut compenser les pertes.</p>
+                                <p>Un portefeuille diversifié contient généralement des actions, des obligations, des matières premières, etc., pour minimiser le risque non systémique (le risque lié à un seul secteur ou une seule entreprise).</p>
+                                <p>Le vieil adage dit : "Ne mettez pas tous vos œufs dans le même panier."</p>
+                            `,
+                            questions: [
+                                { type: 'mcq', text: "En trading, la diversification consiste à...", choices: ["Investir tout l'argent dans une seule action", "Placer son capital sur différents types d'actifs (actions, obligations, immobilier...)", "Toujours acheter quand le prix monte", "Utiliser un seul courtier en ligne"], answer: "Placer son capital sur différents types d'actifs (actions, obligations, immobilier...)" },
+                                { type: 'mcq', text: "La diversification vise principalement à minimiser quel type de risque ?", choices: ["Le risque que l'économie s'effondre (systémique)", "Le risque lié à une seule entreprise ou secteur (non systémique)", "Le risque de ne pas gagner d'argent", "Le risque d'inflation"], answer: "Le risque lié à une seule entreprise ou secteur (non systémique)" },
+                                { type: 'input', text: "Nommez un type d'actif (autre qu'une action) sur lequel vous pourriez vous diversifier.", answer: "Obligation" }
+                            ]
+                        },
+                        'risque-3': {
+                            icon: '🎯',
+                            title: "Ratio Risque/Rendement",
+                            type: 'standard',
+                            content: `
+                                <h3>Calculer le Risque/Rendement</h3>
+                                <p>Le <strong>Ratio Risque/Rendement (RRR)</strong> est le rapport entre le montant que vous risquez de perdre (distance jusqu'au Stop Loss) et le montant que vous espérez gagner (distance jusqu'à l'objectif de profit, ou 'Take Profit').</p>
+                                <p>Un ratio de 1:3 signifie que vous risquez 1 € pour espérer en gagner 3 €. Les traders professionnels recherchent souvent des ratios de 1:2 ou plus pour assurer une rentabilité même s'ils perdent plus souvent qu'ils ne gagnent.</p>
+                                <p>Exemple : Risque de 50 € (Stop Loss) et Gain potentiel de 150 € (Take Profit) = RRR de 50:150, soit 1:3.</p>
+                            `,
+                            questions: [
+                                { type: 'mcq', text: "Un ratio Risque/Rendement de 1:3 signifie :", choices: ["Gagner 1 pour risquer 3", "Gagner 3 pour risquer 1", "La perte maximale est de 3", "Le gain est garanti 3 fois"], answer: "Gagner 3 pour risquer 1" },
+                                { type: 'mcq', text: "Si vous perdez 100 $ sur un trade et gagnez 200 $ sur un autre, quel est le RRR de votre premier trade ?", choices: ["1:1", "1:2", "2:1", "0.5:1"], answer: "1:2" },
+                                { type: 'input', text: "En utilisant le Stop Loss, quel paramètre contrôlez-vous avant de faire un trade ?", answer: "Risque" }
+                            ]
+                        },
+                        'validation-3': {
+                            icon: '⭐',
+                            title: "Validation : Gestion des Risques",
+                            type: 'validation',
+                            unitToValidate: 'unit-3',
+                            passRate: 0.8,
+                            questions: []
+                        }
+                    }
+                },
+                'unit-4': {
+                    title: "Unité 4 : Psychologie du Trading",
+                    lessons: {
+                        'psycho-1': {
+                            icon: '🧠',
+                            title: "Biais d'Ancrage et de Confirmation",
+                            type: 'standard',
+                            content: `
+                                <h3>Les Biais Cognitifs</h3>
+                                <p>La psychologie est essentielle en trading. Deux biais courants sont :</p>
+                                <ul>
+                                    <li><strong>Biais d'Ancrage :</strong> Tendance à se fier trop fortement à la première information reçue (par exemple, le prix initial d'achat d'une action) pour prendre des décisions ultérieures.</li>
+                                    <li><strong>Biais de Confirmation : </strong>Tendance à ne rechercher et à n'interpréter que les informations qui confirment ses propres croyances ou hypothèses initiales, ignorant les signaux contraires.</li>
+                                </ul>
+                                <p>Ces biais peuvent entraîner des prises de décision irrationnelles, comme conserver une action perdante parce qu'elle a déjà beaucoup baissé.</p>
+                            `,
+                            questions: [
+                                { type: 'mcq', text: "Si un trader ignore les mauvaises nouvelles pour une action qu'il possède, il est victime du :", choices: ["Biais d'Ancrage", "Biais de Confirmation", "L'effet Dunning-Kruger", "L'aversion à la perte"], answer: "Biais de Confirmation" },
+                                { type: 'mcq', text: "Le prix initial auquel vous avez acheté un titre ne devrait pas influencer votre décision de le vendre. Quel biais cognitif ce comportement tente-t-il d'éviter ?", choices: ["Biais de Disponibilité", "Biais d'Ancrage", "Biais Rétrospectif", "Biais d'Excès de Confiance"], answer: "Biais d'Ancrage" },
+                                { type: 'input', text: "Quel est l'outil principal pour surmonter les biais et les émotions dans l'investissement ?", answer: "Plan de trading" }
+                            ]
+                        },
+                        'psycho-2': {
+                            icon: '🧘',
+                            title: "Discipline et Journal de Trading",
+                            type: 'standard',
+                            content: `
+                                <h3>L'Importance de la Discipline</h3>
+                                <p>La <strong>discipline</strong> en trading est la capacité de s'en tenir à son plan de trading même lorsque les émotions (peur ou cupidité) tentent de prendre le dessus. L'impulsivité est l'ennemi juré du succès à long terme.</p>
+                                <p>Un <strong>Journal de Trading</strong> est un outil où vous enregistrez chaque transaction, y compris la raison de l'entrée et de la sortie, les émotions ressenties, et le résultat. Cela permet d'analyser objectivement vos performances et d'identifier les erreurs récurrentes.</p>
+                                <p>La discipline transforme une stratégie en résultats constants.</p>
+                            `,
+                            questions: [
+                                { type: 'mcq', text: "Quel est l'un des principaux objectifs d'un journal de trading ?", choices: ["Prouver que l'on a toujours raison", "Analyser objectivement les erreurs et les succès passés", "Garder un historique pour le fisc", "Copier les trades d'autres personnes"], answer: "Analyser objectivement les erreurs et les succès passés" },
+                                { type: 'mcq', text: "La peur (de perdre) et la cupidité (de gagner plus) sont les deux émotions principales que la discipline doit contrôler. Comment appelle-t-on le risque de prendre des décisions sous l'emprise de ces émotions ?", choices: ["Risque de Liquidité", "Risque Opérationnel", "Risque Psychologique", "Risque de Faillite"], answer: "Risque Psychologique" },
+                                { type: 'input', text: "Quelle est la vertu que le trader doit exercer pour ne pas s'écarter de sa stratégie prédéfinie ?", answer: "Discipline" }
+                            ]
+                        },
+                        'validation-4': {
+                            icon: '⭐',
+                            title: "Validation : Psychologie",
+                            type: 'validation',
+                            unitToValidate: 'unit-4',
+                            passRate: 0.8,
+                            questions: []
+                        }
+                    }
+                },
+                'unit-5': {
+                    title: "Unité 5 : Les Produits Dérivés",
+                    lessons: {
+                        'derives-1': {
+                            icon: '🔗',
+                            title: "Introduction aux Options",
+                            type: 'standard',
+                            content: `
+                                <h3>Comprendre les Options</h3>
+                                <p>Une <strong>option</strong> est un contrat qui donne à son acheteur le <strong>droit</strong>, mais non l'obligation, d'acheter (option 'Call') ou de vendre (option 'Put') un actif sous-jacent (comme une action) à un prix prédéterminé ('Prix d'exercice' ou 'Strike') avant ou à une certaine date ('Échéance').</p>
+                                <ul>
+                                    <li>Acheter un <strong>Call</strong> = Parier sur la hausse.</li>
+                                    <li>Acheter un <strong>Put</strong> = Parier sur la baisse.</li>
+                                </ul>
+                                <p>Les options permettent d'utiliser l'effet de levier et sont souvent utilisées pour la couverture (Hedging) ou la spéculation.</p>
+                            `,
+                            questions: [
+                                { type: 'mcq', text: "L'achat d'une option Call donne le droit d'...", choices: ["Acheter l'actif sous-jacent", "Vendre l'actif sous-jacent", "Recevoir un dividende", "Gagner automatiquement"], answer: "Acheter l'actif sous-jacent" },
+                                { type: 'mcq', text: "Pour un acheteur, qu'est-ce qui est 'optionnel' dans un contrat d'option ?", choices: ["Le prix d'exercice", "Le paiement de la prime", "L'exécution du contrat à l'échéance", "L'actif sous-jacent"], answer: "L'exécution du contrat à l'échéance" },
+                                { type: 'input', text: "Comment appelle-t-on le prix prédéterminé auquel l'actif peut être acheté ou vendu dans le contrat d'option ?", answer: "Prix d'exercice" }
+                            ]
+                        },
+                        'derives-2': {
+                            icon: '🤝',
+                            title: "Introduction aux Futures",
+                            type: 'standard',
+                            content: `
+                                <h3>Comprendre les Futures (Contrats à Terme)</h3>
+                                <p>Un contrat <strong>Future</strong> est un accord entre deux parties pour acheter ou vendre un actif (matières premières, indices boursiers, devises) à un prix prédéterminé, à une date future spécifiée.</p>
+                                <p>Contrairement à l'option, le Future est une <strong>obligation</strong> pour les deux parties d'honorer le contrat. Ils sont principalement utilisés par les entreprises pour la couverture (ex: un agriculteur vend un Future pour fixer le prix de sa récolte future) et par les spéculateurs.</p>
+                                <p>Le marché des Futures est très réglementé et permet d'utiliser un effet de levier considérable.</p>
+                            `,
+                            questions: [
+                                { type: 'mcq', text: "Le contrat Future donne-t-il le droit ou l'obligation d'acheter/vendre l'actif ?", choices: ["Le droit, mais pas l'obligation", "L'obligation", "C'est au choix de l'acheteur", "C'est au choix du vendeur"], answer: "L'obligation" },
+                                { type: 'mcq', text: "Quel terme désigne l'utilisation des Futures par une entreprise pour fixer le prix futur d'une transaction et se protéger contre la volatilité des prix ?", choices: ["Spéculation", "Arbitrage", "Couverture (Hedging)", "Mining"], answer: "Couverture (Hedging)" },
+                                { type: 'input', text: "Le contrat Future est exécuté à une date précise. Comment appelle-t-on cette date ?", answer: "Échéance" }
+                            ]
+                        },
+                        'validation-5': {
+                            icon: '⭐',
+                            title: "Validation : Produits Dérivés",
+                            type: 'validation',
+                            unitToValidate: 'unit-5',
+                            passRate: 0.8,
+                            questions: []
+                        }
+                    }
+                }
+            };
+
+
+            // --- 2. Données de l'Utilisateur ---
+            const defaultUserData = {
+                streak: 0,
+                gems: 100,
+                lives: 5, // Maximum 5 vies
+                // L'état de chaque leçon est géré ici
+                progress: { 
+                    'bases-1': 'active', // U1 L1
+                    'bases-2': 'locked',
+                    'bases-3': 'locked', 
+                    'validation-1': 'locked', // U1 Validation
+                    
+                    'analyse-1': 'locked', // U2 L1
+                    'analyse-2': 'locked',
+                    'analyse-3': 'locked', 
+                    'validation-2': 'locked', // U2 Validation
+
+                    'risque-1': 'locked', // U3 L1
+                    'risque-2': 'locked',
+                    'risque-3': 'locked',
+                    'validation-3': 'locked', // U3 Validation
+
+                    'psycho-1': 'locked', // U4 L1
+                    'psycho-2': 'locked',
+                    'validation-4': 'locked', // U4 Validation
+
+                    'derives-1': 'locked', // U5 L1
+                    'derives-2': 'locked',
+                    'validation-5': 'locked' // U5 Validation (Fin du parcours)
+                }
+            };
+            
+            let userData = loadUserData();
+
+            // --- 3. Références aux éléments du DOM ---
+            const bodyEl = document.body;
+            const darkModeToggle = document.getElementById('dark-mode-toggle');
+            const adminUnlockBtn = document.getElementById('admin-unlock-btn'); 
+            const learningPathEl = document.getElementById('learning-path');
+            const lessonModalEl = document.getElementById('lesson-modal');
+            const lessonTitleEl = document.getElementById('lesson-title');
+            const lessonBodyContainerEl = document.getElementById('lesson-body-container');
+            const feedbackFooterEl = document.getElementById('feedback-footer');
+            const closeLessonBtn = document.getElementById('close-lesson-btn');
+            
+            const lifeCountEl = document.getElementById('life-count');
+            const gemCountEl = document.getElementById('gem-count');
+            const streakCountEl = document.getElementById('streak-count');
+
+            // --- 4. Variables d'état du jeu ---
+            let currentLessonId = null;
+            let currentUnitId = null;
+            let currentQuestionIndex = 0;
+            let selectedAnswer = null;
+            let currentSessionType = 'lesson'; // 'lesson', 'practice', ou 'validation'
+            let isExplaining = false; 
+            let currentValidationQuestions = []; // Stocke les questions générées pour le test de validation
+            let lastAttemptWasIncorrect = false; // Nouvel état pour gérer la répétition de la question
+
+            // --- Utilitaires ---
+            /** Mélange un tableau */
+            function shuffleArray(array) {
+                for (let i = array.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [array[i], array[j]] = [array[j], array[i]];
+                }
+                return array;
+            }
+
+            // --- 5. Fonctions de Gestion des Données (LocalStorage) ---
+
+            function loadUserData() {
+                const savedData = localStorage.getItem('tradeLingoUser');
+                if (savedData) {
+                    const parsedData = JSON.parse(savedData);
+                    // S'assurer que toutes les nouvelles leçons par défaut sont ajoutées si elles manquent
+                    const mergedProgress = { ...defaultUserData.progress, ...parsedData.progress };
+                    return { ...defaultUserData, ...parsedData, progress: mergedProgress };
+                }
+                return { ...defaultUserData };
+            }
+
+            function saveUserData() {
+                localStorage.setItem('tradeLingoUser', JSON.stringify(userData));
+            }
+
+            // --- 6. Fonctions de Rendu (Affichage) ---
+
+            /**
+             * Gère le mode sombre
+             */
+            function initializeDarkMode() {
+                const savedMode = localStorage.getItem('themeMode') || 'light-mode';
+                bodyEl.className = savedMode;
+                darkModeToggle.innerText = savedMode === 'dark-mode' ? '☀️ Mode Clair' : '🌙 Mode Sombre';
+            }
+
+            function toggleDarkMode() {
+                if (bodyEl.classList.contains('light-mode')) {
+                    bodyEl.className = 'dark-mode';
+                    localStorage.setItem('themeMode', 'dark-mode');
+                    darkModeToggle.innerText = '☀️ Mode Clair';
+                } else {
+                    bodyEl.className = 'light-mode';
+                    localStorage.setItem('themeMode', 'light-mode');
+                    darkModeToggle.innerText = '🌙 Mode Sombre';
+                }
+            }
+
+
+            /**
+             * Met à jour les stats (vies, gemmes, série) dans le header
+             */
+            function updateStatsUI() {
+                lifeCountEl.innerText = userData.lives;
+                gemCountEl.innerText = userData.gems;
+                streakCountEl.innerText = userData.streak;
+            }
+
+            /**
+             * Crée le parcours d'apprentissage complet dans le HTML
+             */
+            function renderLearningPath() {
+                learningPathEl.innerHTML = ''; 
+                
+                for (const [unitId, unitData] of Object.entries(courseContent)) {
+                    const unitDiv = document.createElement('div');
+                    unitDiv.className = 'unit-container';
+                    unitDiv.innerHTML = `<h3 class="unit-title">${unitData.title}</h3>`;
+                    
+                    let isFirstLesson = true;
+                    for (const [lessonId, lessonData] of Object.entries(unitData.lessons)) {
+                        const lessonStatus = userData.progress[lessonId] || 'locked'; 
+                        
+                        // Ajouter un connecteur au-dessus de chaque nœud sauf le premier de l'unité
+                        if (!isFirstLesson) {
+                            const connector = document.createElement('div');
+                            connector.className = lessonData.type === 'validation' ? 'validation-connector' : 'connector';
+                            unitDiv.appendChild(connector);
+                        }
+                        isFirstLesson = false;
+                        
+                        const lessonNode = document.createElement('div');
+                        lessonNode.className = `lesson-node ${lessonStatus} ${lessonData.type === 'validation' ? 'validation' : ''}`;
+                        lessonNode.dataset.lessonId = lessonId;
+                        lessonNode.dataset.unitId = unitId; 
+                        
+                        let icon = lessonData.icon;
+                        if (lessonStatus === 'completed' && lessonData.type === 'standard') {
+                            icon = '✔️';
+                        } else if (lessonStatus === 'completed' && lessonData.type === 'validation') {
+                            icon = '🏆';
+                        }
+                        
+                        lessonNode.innerHTML = `<span>${icon}</span>`;
+
+                        if (lessonStatus !== 'locked') {
+                            lessonNode.addEventListener('click', () => startLesson(unitId, lessonId));
+                        }
+                        unitDiv.appendChild(lessonNode);
+                    }
+                    learningPathEl.appendChild(unitDiv);
+                }
+            }
+            
+            // --- 7. Fonctions de Logique de Jeu (Validation) ---
+            
+            /**
+             * Génère un ensemble de questions aléatoires pour le cours de validation.
+             */
+            function generateValidationQuestions(unitId) {
+                let allQuestions = [];
+                const unit = courseContent[unitId];
+                
+                // Collecter toutes les questions de toutes les leçons STANDARD de l'unité
+                for (const lessonId in unit.lessons) {
+                    const lesson = unit.lessons[lessonId];
+                    if (lesson.type === 'standard' && lesson.questions) {
+                        allQuestions.push(...lesson.questions);
+                    }
+                }
+
+                // Mélanger et sélectionner le nombre défini
+                return shuffleArray(allQuestions).slice(0, QUESTIONS_PER_VALIDATION);
+            }
+
+            /**
+             * Affiche le contenu de la leçon (Explication)
+             */
+            function loadExplanation() {
+                isExplaining = true;
+                feedbackFooterEl.innerHTML = ''; 
+                feedbackFooterEl.className = 'feedback-footer';
+
+                const lesson = courseContent[currentUnitId].lessons[currentLessonId];
+                lessonTitleEl.innerText = lesson.title;
+
+                lessonBodyContainerEl.innerHTML = `
+                    <div class="course-explanation">
+                        ${lesson.content}
+                        <button class="explanation-next-btn" id="start-quiz-btn">Commencer l'exercice</button>
+                    </div>
+                    <div id="question-area"></div>
+                `;
+                
+                document.getElementById('start-quiz-btn').addEventListener('click', startQuiz);
+            }
+            
+            /**
+             * Passe de l'explication à la première question
+             */
+            function startQuiz() {
+                isExplaining = false;
+                lastAttemptWasIncorrect = false; // Réinitialiser pour le début du quiz
+                
+                // Si c'est une validation, générer les questions
+                if (currentSessionType === 'validation') {
+                    const lessonData = courseContent[currentUnitId].lessons[currentLessonId];
+                    currentValidationQuestions = generateValidationQuestions(lessonData.unitToValidate);
+                    // Remplacer l'explication par le message de début de validation
+                    lessonTitleEl.innerText = lessonData.title;
+                    lessonBodyContainerEl.innerHTML = `
+                        <div class="course-explanation">
+                            <h3>Test de Maîtrise</h3>
+                            <p>Ce test évalue votre maîtrise de l'Unité ${lessonData.unitToValidate.slice(-1)}. Vous devez obtenir ${lessonData.passRate * 100}% de bonnes réponses pour la débloquer.</p>
+                            <p>Bonne chance !</p>
+                            <button class="explanation-next-btn" id="start-quiz-btn">Démarrer le Test de ${QUESTIONS_PER_VALIDATION} Questions</button>
+                        </div>
+                        <div id="question-area"></div>
+                    `;
+                    document.getElementById('start-quiz-btn').addEventListener('click', () => {
+                        document.querySelector('.course-explanation').style.display = 'none';
+                        document.getElementById('question-area').style.display = 'block';
+                        loadQuestion();
+                    });
+                } else {
+                    document.querySelector('.course-explanation').style.display = 'none';
+                    document.getElementById('question-area').style.display = 'block';
+                    loadQuestion();
+                }
+            }
+
+
+            /**
+             * Affiche la question actuelle dans le modal
+             */
+            function loadQuestion() {
+                selectedAnswer = null;
+                feedbackFooterEl.innerHTML = `<button class="footer-btn" id="check-answer-btn">Vérifier</button>`;
+                feedbackFooterEl.className = 'feedback-footer'; 
+
+                const checkAnswerBtn = document.getElementById('check-answer-btn');
+                checkAnswerBtn.disabled = true;
+                checkAnswerBtn.addEventListener('click', checkAnswer);
+
+                let questionsArray;
+                if (currentSessionType === 'validation' || currentSessionType === 'practice') {
+                    questionsArray = currentValidationQuestions;
+                } else {
+                    const lesson = courseContent[currentUnitId].lessons[currentLessonId];
+                    questionsArray = lesson.questions;
+                }
+                
+                const question = questionsArray[currentQuestionIndex];
+                
+                let questionTextPrefix = currentSessionType === 'lesson' && lastAttemptWasIncorrect 
+                    ? `<span style="color: var(--red); font-weight: normal;">Réessaie. </span>` 
+                    : `${currentQuestionIndex + 1}/${questionsArray.length}. `;
+
+                let questionHTML = `<p id="question-text">${questionTextPrefix}${question.text}</p>`;
+
+                if (question.type === 'mcq') {
+                    // Si c'est un QCM, mélanger les choix (mais seulement si ce n'est pas une répétition après un échec)
+                    let choices = question.choices;
+                    if (!lastAttemptWasIncorrect) {
+                        choices = shuffleArray([...question.choices]);
+                    }
+
+                    choices.forEach(choice => {
+                        questionHTML += 
+                            `<button class="choice-button" data-choice="${choice}">${choice}</button>`;
+                    });
+                } else if (question.type === 'input') {
+                    questionHTML += 
+                        `<input type="text" id="input-answer" class="input-answer" placeholder="Votre réponse...">`;
+                }
+                
+                document.getElementById('question-area').innerHTML = questionHTML;
+
+                // Ajoute les écouteurs pour l'interaction
+                if (question.type === 'mcq') {
+                    document.querySelectorAll('.choice-button').forEach(button => {
+                        button.addEventListener('click', () => {
+                            document.querySelectorAll('.choice-button').forEach(btn => btn.classList.remove('selected'));
+                            button.classList.add('selected');
+                            selectedAnswer = button.dataset.choice;
+                            checkAnswerBtn.disabled = false;
+                        });
+                    });
+                } else if (question.type === 'input') {
+                    const inputField = document.getElementById('input-answer');
+                    inputField.addEventListener('input', (e) => {
+                        selectedAnswer = e.target.value;
+                        checkAnswerBtn.disabled = selectedAnswer.trim() === '';
+                    });
+                }
+            }
+
+            // --- 8. Fonctions de Logique de Jeu (Début de leçon/validation) ---
+
+            /**
+             * Ouvre le modal et charge l'explication (leçon) ou le quiz de validation/pratique
+             */
+            function startLesson(unitId, lessonId) {
+                currentUnitId = unitId;
+                currentLessonId = lessonId;
+                const lessonData = courseContent[unitId].lessons[lessonId];
+                const lessonStatus = userData.progress[lessonId];
+
+                // Déterminer le type de session
+                if (lessonData.type === 'validation') {
+                    currentSessionType = 'validation';
+                } else if (lessonStatus === 'completed') {
+                    currentSessionType = 'practice';
+                } else {
+                    currentSessionType = 'lesson';
+                }
+
+                // Vérification des vies (Seulement pour les nouvelles leçons standard)
+                if (currentSessionType === 'lesson' && userData.lives <= 0) {
+                    showOutOfLivesMessage();
+                    return;
+                }
+                
+                // FIX: Assurer que l'index de la question est toujours à 0 au début d'une session
+                currentQuestionIndex = 0; 
+                lastAttemptWasIncorrect = false; // Réinitialiser
+                
+                // Début de la session
+                lessonModalEl.style.display = 'flex';
+                lessonTitleEl.innerText = lessonData.title;
+
+                if (currentSessionType === 'lesson') {
+                    loadExplanation(); 
+                } else {
+                    // Pour la pratique ou la validation, on va directement au quiz (via startQuiz)
+                    // Pour la pratique, on réutilise les questions de la leçon
+                    if (currentSessionType === 'practice') {
+                         currentValidationQuestions = lessonData.questions;
+                    }
+                    // Pour la validation, startQuiz génère le set de questions
+                    startQuiz(); 
+                }
+            }
+
+            /**
+             * Vérifie la réponse de l'utilisateur
+             */
+            function checkAnswer() {
+                let questionsArray;
+                if (currentSessionType === 'validation' || currentSessionType === 'practice') {
+                    questionsArray = currentValidationQuestions;
+                } else {
+                    const lesson = courseContent[currentUnitId].lessons[currentLessonId];
+                    questionsArray = lesson.questions;
+                }
+                
+                const question = questionsArray[currentQuestionIndex];
+                let isCorrect = false;
+
+                document.querySelectorAll('.choice-button, .input-answer').forEach(el => el.disabled = true);
+
+                // --- Logique de vérification ---
+                if (question.type === 'mcq') {
+                    isCorrect = (selectedAnswer === question.answer);
+                    document.querySelectorAll('.choice-button').forEach(button => {
+                        if (button.dataset.choice === question.answer) {
+                            button.classList.add('correct');
+                        } else if (button.dataset.choice === selectedAnswer) {
+                            button.classList.add('incorrect');
+                        }
+                    });
+                } else if (question.type === 'input') {
+                    // Utiliser une vérification flexible (ignore la casse et les espaces superflus)
+                    isCorrect = (selectedAnswer.trim().toLowerCase() === question.answer.toLowerCase());
+                    const inputField = document.getElementById('input-answer');
+                    if (isCorrect) {
+                        inputField.classList.add('correct');
+                    } else {
+                        inputField.classList.add('incorrect');
+                    }
+                }
+                
+                // Sauvegarder l'état de la tentative
+                lastAttemptWasIncorrect = !isCorrect;
+
+                // Sauvegarder le résultat pour la validation
+                if (currentSessionType === 'validation') {
+                    questionsArray[currentQuestionIndex].wasCorrect = isCorrect;
+                }
+
+                // --- Affichage du Feedback ---
+                const feedbackMsg = document.createElement('div');
+                feedbackMsg.id = 'feedback-message';
+
+                if (isCorrect) {
+                    feedbackFooterEl.className = 'feedback-footer correct';
+                    feedbackMsg.className = 'correct';
+                    feedbackMsg.innerText = "Bonne réponse ! Continuez.";
+                    if (currentSessionType === 'lesson') {
+                        userData.streak++;
+                    }
+                } else {
+                    feedbackFooterEl.className = 'feedback-footer incorrect';
+                    feedbackMsg.className = 'incorrect';
+                    
+                    // Afficher la bonne réponse pour la leçon standard pour permettre à l'utilisateur d'apprendre
+                    if (question.type === 'input') {
+                        feedbackMsg.innerText = `Dommage. La bonne réponse est : "${question.answer}"`;
+                    } else if (currentSessionType === 'lesson') {
+                        feedbackMsg.innerText = `Dommage. Ce n'est pas correct. Réponse : "${question.answer}"`;
+                    } else { // Validation / Practice
+                        feedbackMsg.innerText = "Dommage. Ce n'est pas correct.";
+                    }
+                    
+                    if (currentSessionType === 'lesson') {
+                        userData.lives--;
+                        userData.streak = 0;
+                        updateStatsUI();
+                        saveUserData();
+                    }
+                }
+
+                const continueBtnClass = isCorrect ? 'correct-btn' : 'incorrect-btn';
+                const nextBtnText = (currentSessionType === 'lesson' && !isCorrect) ? "Réessayer la question" : "Continuer";
+
+                feedbackFooterEl.innerHTML = `<button id="next-btn" class="footer-btn ${continueBtnClass}">${nextBtnText}</button>`;
+                feedbackFooterEl.prepend(feedbackMsg);
+                document.getElementById('next-btn').addEventListener('click', nextStep);
+                
+                if (userData.lives <= 0 && currentSessionType === 'lesson') {
+                    document.getElementById('next-btn').innerText = "Terminer la leçon (Plus de vies)";
+                }
+            }
+
+            /**
+             * Passe à la question suivante ou termine la session
+             */
+            function nextStep() {
+                if (userData.lives <= 0 && currentSessionType === 'lesson') {
+                    closeLesson();
+                    showOutOfLivesMessage(); 
+                    return;
+                }
+                
+                // Logique de répétition de question pour les leçons standard
+                if (currentSessionType === 'lesson' && lastAttemptWasIncorrect) {
+                    // Si l'échec est sur une leçon, on NE passe PAS à la question suivante.
+                    // On recharge simplement la même question pour une nouvelle tentative.
+                    loadQuestion();
+                    return; 
+                }
+
+                currentQuestionIndex++;
+                
+                let questionsArray;
+                if (currentSessionType === 'validation' || currentSessionType === 'practice') {
+                    questionsArray = currentValidationQuestions;
+                } else {
+                    const lesson = courseContent[currentUnitId].lessons[currentLessonId];
+                    questionsArray = lesson.questions;
+                }
+
+                if (currentQuestionIndex < questionsArray.length) {
+                    loadQuestion(); 
+                } else {
+                    completeSession();
+                }
+            }
+            
+            /**
+             * Gère la fin d'une session (leçon, pratique, ou validation)
+             */
+            function completeSession() {
+                let summaryMessage = "";
+                let isSuccess = true;
+                let rewardGems = 0;
+                let nextAction = "Continuer vers le parcours";
+                let btnClass = "correct-btn";
+
+
+                if (currentSessionType === 'practice') {
+                    userData.lives = Math.min(LIFE_MAX, userData.lives + 1); 
+                    summaryMessage = "✔️ Pratique terminée ! ❤️ +1 Vie Regagnée (Max: 5) !";
+                } else if (currentSessionType === 'validation') {
+                    const lessonData = courseContent[currentUnitId].lessons[currentLessonId];
+                    const correctCount = currentValidationQuestions.filter(q => q.wasCorrect).length;
+                    const passCount = Math.ceil(QUESTIONS_PER_VALIDATION * lessonData.passRate);
+                    isSuccess = correctCount >= passCount;
+
+                    if (isSuccess) {
+                        rewardGems = 20;
+                        userData.gems += rewardGems;
+                        userData.progress[currentLessonId] = 'completed';
+                        handleLessonUnlock(currentLessonId, 'validation');
+                        summaryMessage = `🏆 Validation réussie (${correctCount}/${QUESTIONS_PER_VALIDATION}) ! 💎 +${rewardGems} Gemmes ! L'unité suivante est débloquée.`;
+                    } else {
+                        rewardGems = 5;
+                        userData.gems += rewardGems;
+                        btnClass = "incorrect-btn";
+                        summaryMessage = `❌ Échec de la Validation (${correctCount}/${QUESTIONS_PER_VALIDATION}). Il fallait ${passCount} bonnes réponses. 💎 +${rewardGems} Gemmes pour la tentative. Révisez et réessayez !`;
+                    }
+                } else { // Standard Lesson
+                    rewardGems = 10;
+                    userData.gems += rewardGems;
+                    userData.progress[currentLessonId] = 'completed';
+                    handleLessonUnlock(currentLessonId, 'standard');
+                    summaryMessage = `✅ Leçon terminée ! 💎 +${rewardGems} Gemmes gagnées !`;
+                }
+                
+                lessonBodyContainerEl.innerHTML = `
+                    <div style="padding: 25px;">
+                        <h2 style="text-align: center; color: ${isSuccess ? 'var(--green)' : 'var(--red)'}; margin-bottom: 20px;">${isSuccess ? 'Félicitations !' : 'À Réviser !'}</h2>
+                        <p style="text-align: center; font-size: 1.2rem; font-weight: bold; padding: 15px; border-radius: 8px; background-color: var(--grey-light);">${summaryMessage}</p>
+                    </div>
+                `;
+                feedbackFooterEl.className = 'feedback-footer ' + (isSuccess ? 'correct' : 'incorrect');
+                feedbackFooterEl.innerHTML = `<button id="close-modal-btn" class="footer-btn ${btnClass}">${nextAction}</button>`;
+                document.getElementById('close-modal-btn').addEventListener('click', closeLesson);
+                
+                updateStatsUI();
+                saveUserData();
+            }
+            
+            /**
+             * Débloque la leçon/validation suivante en fonction du type de leçon complétée
+             */
+            function handleLessonUnlock(completedLessonId, type) {
+                // 1. Aplatir le parcours pour trouver l'ordre séquentiel
+                let allLessons = [];
+                for (const unitId in courseContent) {
+                    for (const lessonId in courseContent[unitId].lessons) {
+                        allLessons.push(lessonId);
+                    }
+                }
+
+                const currentLessonIndex = allLessons.indexOf(completedLessonId);
+                const nextLessonId = allLessons[currentLessonIndex + 1];
+
+                if (!nextLessonId) return; // Fin du parcours
+
+                // 2. Logique de déverrouillage
+                if (type === 'standard') {
+                    // Les leçons standard déverrouillent toujours la leçon suivante dans la séquence
+                    if (userData.progress[nextLessonId] === 'locked') {
+                        userData.progress[nextLessonId] = 'active';
+                    }
+                } else if (type === 'validation') {
+                    // Les validations déverrouillent la première leçon de l'UNITÉ suivante.
+                    if (userData.progress[nextLessonId] === 'locked') {
+                        userData.progress[nextLessonId] = 'active';
+                    }
+                }
+            }
+
+
+            /**
+             * Ferme le modal de leçon et met à jour le parcours
+             */
+            function closeLesson() {
+                lessonModalEl.style.display = 'none';
+                renderLearningPath(); 
+            }
+            
+            /**
+             * Permet d'acheter un pack de vies si l'utilisateur a assez de gemmes.
+             */
+            function buyLives() {
+                if (userData.gems >= LIFE_PACK_COST) {
+                    userData.gems -= LIFE_PACK_COST;
+                    userData.lives = LIFE_MAX; 
+                    
+                    updateStatsUI();
+                    saveUserData();
+                    
+                    lessonTitleEl.innerText = "Achat réussi !";
+                    lessonBodyContainerEl.innerHTML = `
+                        <div style="padding: 25px;">
+                            <p id="question-text" style="text-align: center; color: var(--green);">
+                                ❤️ ${LIFE_PACK_AMOUNT} vies achetées pour 💎 ${LIFE_PACK_COST} gemmes ! 
+                                <br><br>
+                                Tu es prêt à apprendre !
+                            </p>
+                        </div>
+                    `;
+                    feedbackFooterEl.className = 'feedback-footer correct';
+                    feedbackFooterEl.innerHTML = `<button id="close-modal-btn" class="footer-btn correct-btn">Continuer vers le parcours</button>`;
+                    document.getElementById('close-modal-btn').addEventListener('click', closeLesson);
+
+                } else {
+                    lessonTitleEl.innerText = "Achat impossible";
+                    lessonBodyContainerEl.innerHTML = `
+                        <div style="padding: 25px;">
+                            <p id="question-text" style="text-align: center; color: var(--red);">
+                                Il te manque des gemmes ! Tu as 💎 ${userData.gems} mais il te faut 💎 ${LIFE_PACK_COST} pour un plein de vies.
+                            </p>
+                        </div>
+                    `;
+                    feedbackFooterEl.className = 'feedback-footer incorrect';
+                    feedbackFooterEl.innerHTML = `<button id="close-modal-btn" class="footer-btn incorrect-btn">D'accord</button>`;
+                    document.getElementById('close-modal-btn').addEventListener('click', closeLesson);
+                }
+            }
+
+
+            /**
+             * Affiche un message "plus de vies" et l'option d'achat.
+             */
+            function showOutOfLivesMessage() {
+                lessonTitleEl.innerText = "Alerte : Plus de vies !";
+                
+                const canAfford = userData.gems >= LIFE_PACK_COST;
+                const buyBtnClass = canAfford ? 'correct-btn' : 'incorrect-btn';
+                const buyBtnText = `Acheter ${LIFE_PACK_AMOUNT} Vies pour 💎 ${LIFE_PACK_COST}`;
+                
+                lessonBodyContainerEl.innerHTML = `
+                    <div style="padding: 25px;">
+                        <p id="question-text" style="text-align: center;">
+                            Tu n'as plus de vies (❤️) pour commencer de nouvelles leçons.
+                            <br><br>
+                            Pratique les leçons déjà terminées (icône ✔️) ou fais les tests de Validation réussis (icône 🏆) pour regagner des vies, ou achète un pack !
+                        </p>
+                    </div>
+                `;
+                
+                feedbackFooterEl.className = 'feedback-footer'; 
+                feedbackFooterEl.innerHTML = `
+                    <button id="buy-lives-btn" class="footer-btn ${buyBtnClass}" style="margin-bottom: 10px;" ${canAfford ? '' : 'disabled'}>
+                        ${buyBtnText}
+                    </button>
+                    <button id="close-modal-btn" class="footer-btn" style="background-color: #888; border-color: #555;">D'accord</button>
+                `;
+                
+                document.getElementById('buy-lives-btn').addEventListener('click', buyLives);
+                document.getElementById('close-modal-btn').addEventListener('click', closeLesson);
+
+                lessonModalEl.style.display = 'flex';
+            }
+            
+            // --- Logique d'administration Toggle ---
+
+            /**
+             * Détermine si le mode Admin 'débloqué' est actuellement actif.
+             */
+            function isAdminUnlocked() {
+                return userData.progress['bases-2'] === 'active' || userData.progress['bases-2'] === 'completed';
+            }
+
+            /**
+             * Met à jour le texte et l'icône du bouton Admin en fonction de l'état actuel.
+             */
+            function updateAdminButtonUI() {
+                const isCurrentlyUnlocked = isAdminUnlocked();
+                if (isCurrentlyUnlocked) {
+                    adminUnlockBtn.innerText = '🔒 Reverrouiller Tout';
+                    adminUnlockBtn.title = 'Reverrouiller toutes les leçons (Mode Dev)';
+                } else {
+                    adminUnlockBtn.innerText = '🔓 Débloquer Tout';
+                    adminUnlockBtn.title = 'Débloquer toutes les leçons (Mode Dev)';
+                }
+            }
+
+
+            /**
+             * Logique d'administration : débloque ou reverrouille toutes les leçons.
+             */
+            function toggleAdminLock() {
+                let changed = false;
+                const isCurrentlyUnlocked = isAdminUnlocked();
+                const action = isCurrentlyUnlocked ? "REVERROUILLAGE" : "DÉBLOQUAGE";
+
+                if (isCurrentlyUnlocked) {
+                    // --- Relock action ---
+                    for (const lessonId in userData.progress) {
+                        // Remettre à 'locked' si ce n'est pas la première leçon et que ce n'est pas déjà verrouillé
+                        if (lessonId !== FIRST_LESSON_ID) {
+                            if (userData.progress[lessonId] !== 'locked') {
+                                userData.progress[lessonId] = 'locked';
+                                changed = true;
+                            }
+                        } else {
+                             // S'assurer que la première leçon reste 'active'
+                             userData.progress[lessonId] = 'active';
+                        }
+                    }
+                } else {
+                    // --- Unlock action ---
+                    for (const lessonId in userData.progress) {
+                        // Débloquer toutes les leçons verrouillées
+                        if (userData.progress[lessonId] === 'locked') {
+                            userData.progress[lessonId] = 'active';
+                            changed = true;
+                        }
+                    }
+                }
+
+                if (changed) {
+                    saveUserData();
+                    renderLearningPath();
+                    updateAdminButtonUI();
+                    console.log(`Admin Action: ${action} réussi.`);
+                } else {
+                    console.log(`Admin Action: ${action} impossible, l'état actuel est déjà conforme.`);
+                }
+            }
+
+
+            // --- 9. Initialisation de l'application ---
+            initializeDarkMode();
+            updateStatsUI();
+            updateAdminButtonUI(); // Initialise l'état du bouton
+            renderLearningPath();
+            
+            closeLessonBtn.addEventListener('click', closeLesson);
+            darkModeToggle.addEventListener('click', toggleDarkMode);
+            adminUnlockBtn.addEventListener('click', toggleAdminLock); // L'écouteur appelle la fonction de bascule
+
+        });
+    </script>
+</body>
+</html>
