@@ -99,17 +99,23 @@
             gap: 5px; /* Réduit l'espace entre les boutons */
             align-items: center;
         }
-        
+        #dark-mode-toggle {
+            margin-right: 30px;
+        }
         #dark-mode-toggle, #admin-unlock-btn {
+            width: 35px;
+            height: 35px;
+            
             background: var(--bg-primary);
             color: var(--text-color);
             border: 2px solid var(--border-color);
             padding: 5px 8px; /* Réduit le padding */
-            border-radius: 8px; /* Légèrement plus petit */
+            border-radius: 50%; /* Légèrement plus petit */
             cursor: pointer;
             font-size: 0.85rem; /* Réduit la taille de police */
             transition: background-color 0.2s, border-color 0.2s;
             white-space: nowrap; 
+            
         }
         #dark-mode-toggle:hover, #admin-unlock-btn:hover {
             background-color: var(--border-color);
@@ -474,11 +480,16 @@
             .stat-icon {
                 font-size: 1.5rem;
             }
-
+            #dark-mode-toggle {
+                 margin-right: 50px;
+            }
             #dark-mode-toggle, #admin-unlock-btn {
+                height: 40px;
+                width: 40px;
                 padding: 8px 15px;
                 font-size: 1rem;
                 border-radius: 10px;
+                text-align: center;
             }
             
             .learning-path {
@@ -582,8 +593,8 @@
         </div>
         <!-- Contrôles du Header (Mode Admin et Sombre) -->
         <div class="header-controls">
-            <button id="admin-unlock-btn" title="Débloquer toutes les leçons (Mode Dev)">🔓 Débloquer Tout</button>
-            <button id="dark-mode-toggle" title="Basculer le thème">🌙 Mode Sombre</button>
+            <button id="admin-unlock-btn" title="Débloquer toutes les leçons (Mode Dev)">🔓</button>
+            <button id="dark-mode-toggle" title="Basculer le thème">🌙</button>
         </div>
     </header>
 
@@ -1008,18 +1019,22 @@
             function initializeDarkMode() {
                 const savedMode = localStorage.getItem('themeMode') || 'light-mode';
                 bodyEl.className = savedMode;
-                darkModeToggle.innerText = savedMode === 'dark-mode' ? '☀️ Mode Clair' : '🌙 Mode Sombre';
+                    darkModeToggle.style.display = 'flex';
+                    darkModeToggle.style.alignItems = 'center';
+                    darkModeToggle.style.justifyContent = 'center';
+                    adminUnlockBtn.style.padding = '0';
+                darkModeToggle.innerText = savedMode === 'dark-mode' ? '☀️' : '🌙';
             }
 
             function toggleDarkMode() {
                 if (bodyEl.classList.contains('light-mode')) {
                     bodyEl.className = 'dark-mode';
                     localStorage.setItem('themeMode', 'dark-mode');
-                    darkModeToggle.innerText = '☀️ Mode Clair';
+                    darkModeToggle.innerText = '☀️';
                 } else {
                     bodyEl.className = 'light-mode';
                     localStorage.setItem('themeMode', 'light-mode');
-                    darkModeToggle.innerText = '🌙 Mode Sombre';
+                    darkModeToggle.innerText = '🌙';
                 }
             }
 
@@ -1577,11 +1592,15 @@
              */
             function updateAdminButtonUI() {
                 const isCurrentlyUnlocked = isAdminUnlocked();
+                    adminUnlockBtn.style.display = 'flex';
+                    adminUnlockBtn.style.alignItems = 'center';
+                    adminUnlockBtn.style.justifyContent = 'center';
+                    adminUnlockBtn.style.padding = '0';
                 if (isCurrentlyUnlocked) {
-                    adminUnlockBtn.innerText = '🔒 Reverrouiller Tout';
+                    adminUnlockBtn.innerText = '🔒';
                     adminUnlockBtn.title = 'Reverrouiller toutes les leçons (Mode Dev)';
                 } else {
-                    adminUnlockBtn.innerText = '🔓 Débloquer Tout';
+                    adminUnlockBtn.innerText = '🔓';
                     adminUnlockBtn.title = 'Débloquer toutes les leçons (Mode Dev)';
                 }
             }
