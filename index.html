@@ -4,11 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TradeLingo - Apprenez le Trading</title>
+    <link rel="icon" type="image/png" href="./logo.png">
     
-    <!-- 
-      SECTION CSS 
-      Tout le style de l'application est ici, optimisé pour la réactivité.
-    -->
     <style>
         /* Variables de couleur pour le Mode Clair */
         :root {
@@ -93,6 +90,10 @@
         .stat-icon-red { color: var(--red); }
         .stat-icon-blue { color: var(--blue); }
 
+        .titre {
+            display: none;
+        }
+
         /* Contrôles du Header (Mode Sombre et Admin) */
         .header-controls {
             display: flex;
@@ -152,6 +153,19 @@
         .unit-container:nth-child(3) .unit-title { background-color: var(--red); }
         .unit-container:nth-child(4) .unit-title { background-color: var(--purple); }
         .unit-container:nth-child(5) .unit-title { background-color: var(--gold-dark); }
+        
+        /* === NOUVEAUX STYLES POUR LA SECTION 2 === */
+        .unit-container:nth-child(6) .unit-title { 
+            background: linear-gradient(45deg, var(--purple-dark), var(--red));
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+        .unit-container:nth-child(7) .unit-title { 
+            background: linear-gradient(45deg, #000, var(--gold-dark));
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+        /* ========================================= */
 
 
         .lesson-node {
@@ -480,6 +494,17 @@
             .stat-icon {
                 font-size: 1.5rem;
             }
+            .titre {
+                display: block;
+                position: absolute;
+                left: 48.5%;
+                top: 50%;
+                transform: translate(-50%, -50%);
+                margin: 0;
+                width: auto;
+            }
+ 
+            }
             #dark-mode-toggle {
                  margin-right: 50px;
             }
@@ -570,12 +595,11 @@
             #feedback-message {
                 font-size: 1.2rem;
             }
-        }
+        
     </style>
 </head>
 <body class="light-mode">
 
-    <!-- 1. Le Header : pour les stats de l'utilisateur -->
     <header class="top-bar">
         <div class="stats-group">
             <div class="stat">
@@ -591,19 +615,18 @@
                 <span id="life-count">5</span>
             </div>
         </div>
-        <!-- Contrôles du Header (Mode Admin et Sombre) -->
+        <div class="titre">
+            <h1>TRADLINGO</h1>
+        </div>
         <div class="header-controls">
             <button id="admin-unlock-btn" title="Débloquer toutes les leçons (Mode Dev)">🔓</button>
             <button id="dark-mode-toggle" title="Basculer le thème">🌙</button>
         </div>
     </header>
 
-    <!-- 2. Le Parcours d'Apprentissage -->
     <main class="learning-path" id="learning-path">
-        <!-- Le parcours (unités et leçons) sera généré par JavaScript ici -->
-    </main>
+        </main>
 
-    <!-- 3. Le Modal de Leçon (caché par défaut) -->
     <div class="lesson-modal" id="lesson-modal">
         <div class="lesson-content">
             <button id="close-lesson-btn" title="Fermer la leçon">✕</button>
@@ -611,19 +634,12 @@
                 <h2 id="lesson-title">Titre de la leçon</h2>
             </header>
             <div id="lesson-body-container">
-                <!-- Contient l'explication et la zone de questions -->
-            </div>
+                </div>
             <footer class="feedback-footer" id="feedback-footer">
-                <!-- Boutons de vérification/continuation -->
-            </footer>
+                </footer>
         </div>
     </div>
 
-    <!-- 
-      SECTION JAVASCRIPT
-      Toute la logique de l'application est ici.
-      (Même code JS que la version précédente pour maintenir la fonctionnalité de répétition)
-    -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
 
@@ -812,8 +828,10 @@
                             `,
                             questions: [
                                 { type: 'mcq', text: "Un ratio Risque/Rendement de 1:3 signifie :", choices: ["Gagner 1 pour risquer 3", "Gagner 3 pour risquer 1", "La perte maximale est de 3", "Le gain est garanti 3 fois"], answer: "Gagner 3 pour risquer 1" },
-                                { type: 'mcq', text: "Si vous perdez 100 $ sur un trade et gagnez 200 $ sur un autre, quel est le RRR de votre premier trade ?", choices: ["1:1", "1:2", "2:1", "0.5:1"], answer: "1:2" },
-                                { type: 'input', text: "En utilisant le Stop Loss, quel paramètre contrôlez-vous avant de faire un trade ?", answer: "Risque" }
+                                // Question modifiée pour être plus difficile
+                                { type: 'mcq', text: "Vous achetez une action à 100€. Vous placez un Stop Loss à 95€ et visez un profit à 120€. Quel est votre ratio Risque/Rendement ?", choices: ["1:3", "1:4", "1:5", "4:1"], answer: "1:4" },
+                                // Question originale (légèrement modifiée)
+                                { type: 'input', text: "Si vous risquez 50€ pour gagner 150€, quel est votre ratio (écrit sous forme X:Y) ?", answer: "1:3" }
                             ]
                         },
                         'validation-3': {
@@ -921,6 +939,103 @@
                             questions: []
                         }
                     }
+                },
+                
+                // ==========================================================
+                // === SECTION 2 : CONTENU PLUS DIFFICILE (PAGE 2) ===
+                // ==========================================================
+                
+                'unit-6': {
+                    title: "Unité 6 : Stratégies Avancées",
+                    lessons: {
+                        'avances-1': {
+                            icon: '💥',
+                            title: "L'Effet de Levier (Leverage)",
+                            type: 'standard',
+                            content: `
+                                <h3>L'Effet de Levier</h3>
+                                <p>L'<strong>effet de levier</strong> (ou 'leverage') consiste à utiliser des fonds empruntés (généralement auprès de votre courtier) pour augmenter la taille de votre position de trading au-delà de ce que votre propre capital permettrait.</p>
+                                <p>Par exemple, avec un levier de 10:1, vous pouvez contrôler une position de 10 000 € avec seulement 1 000 € de capital. Cela <strong>amplifie</strong> les gains potentiels, mais aussi les <strong>pertes potentielles</strong>.</p>
+                                <p>Si le marché bouge contre vous, votre courtier peut émettre un <strong>"Appel de Marge" (Margin Call)</strong>, vous demandant de déposer plus de fonds ou de fermer votre position à perte.</p>
+                            `,
+                            questions: [
+                                { type: 'mcq', text: "Que fait l'effet de levier à la fois pour vos gains et vos pertes ?", choices: ["Il les réduit", "Il les amplifie", "Il les annule", "Il les garantit"], answer: "Il les amplifie" },
+                                { type: 'mcq', text: "Si vous utilisez un levier de 5:1 et investissez 1 000€ de votre propre argent, quelle est la taille totale de votre position ?", choices: ["1 000€", "5 000€", "6 000€", "500€"], answer: "5 000€" },
+                                { type: 'input', text: "Comment appelle-t-on l'alerte du courtier vous demandant de déposer plus de fonds lorsque votre position perdante s'approche de votre capital ?", answer: "Appel de marge" }
+                            ]
+                        },
+                        'avances-2': {
+                            icon: '📉',
+                            title: "La Vente à Découvert (Short)",
+                            type: 'standard',
+                            content: `
+                                <h3>La Vente à Découvert</h3>
+                                <p>La <strong>Vente à Découvert</strong> ('Short Selling') est une stratégie qui permet de parier sur la <strong>baisse</strong> du prix d'un actif.</p>
+                                <p>Le mécanisme est le suivant : 1. Vous empruntez l'action (que vous ne possédez pas) à votre courtier. 2. Vous la vendez immédiatement au prix actuel (ex: 100€). 3. Vous attendez que le prix baisse (ex: 70€). 4. Vous rachetez l'action à ce prix plus bas et la rendez au courtier. Votre profit est la différence (30€).</p>
+                                <p>Le risque principal est que la perte est <strong>théoriquement illimitée</strong>. Si le prix monte à 200€ au lieu de baisser, vous devez racheter l'action plus cher pour la rendre, subissant une perte de 100€.</p>
+                            `,
+                            questions: [
+                                { type: 'mcq', text: "Un trader qui effectue une 'vente à découvert' parie sur...", choices: ["La hausse du prix", "La baisse du prix", "La stagnation du prix", "Le volume des échanges"], answer: "La baisse du prix" },
+                                { type: 'mcq', text: "Quel est le risque théorique maximal d'une vente à découvert ?", choices: ["Votre mise initiale", "Le double de votre mise", "Théoriquement illimité", "Zéro"], answer: "Théoriquement illimité" },
+                                { type: 'input', text: "Si vous 'shortez' une action à 50€ et la rachetez à 30€ pour la rendre, quel est votre profit par action ?", answer: "20" }
+                            ]
+                        },
+                        'validation-6': {
+                            icon: '🏆',
+                            title: "Validation : Stratégies Avancées",
+                            type: 'validation',
+                            unitToValidate: 'unit-6',
+                            passRate: 0.8,
+                            questions: []
+                        }
+                    }
+                },
+                'unit-7': {
+                    title: "Unité 7 : Concepts Experts",
+                    lessons: {
+                        'expert-1': {
+                            icon: '🤖',
+                            title: "Trading Algorithmique (Bases)",
+                            type: 'standard',
+                            content: `
+                                <h3>Le Trading Algorithmique</h3>
+                                <p>Le <strong>Trading Algorithmique</strong> (ou 'Algo Trading') utilise des programmes informatiques pour exécuter des ordres de trading en suivant un ensemble de règles prédéfinies. Ces règles peuvent être basées sur le prix, le volume, le temps, ou des indicateurs techniques.</p>
+                                <p>Le <strong>Trading à Haute Fréquence (HFT)</strong> est une sous-catégorie qui exécute des millions d'ordres en quelques fractions de seconde pour profiter de micro-différences de prix.</p>
+                                <p>L'avantage est la vitesse d'exécution et la suppression de l'émotion. L'inconvénient est le risque de 'flash crashes' si les algorithmes réagissent mal à un événement.</p>
+                            `,
+                            questions: [
+                                { type: 'mcq', text: "Le trading algorithmique exécute des ordres en se basant sur...", choices: ["L'intuition du trader", "Des règles prédéfinies dans un programme", "Les phases de la lune", "Les conseils des journaux"], answer: "Des règles prédéfinies dans un programme" },
+                                { type: 'mcq', text: "Quel est le principal avantage du trading algorithmique par rapport au trading humain ?", choices: ["La créativité", "La compréhension de l'économie globale", "La vitesse d'exécution et l'absence d'émotion", "La chance"], answer: "La vitesse d'exécution et l'absence d'émotion" },
+                                { type: 'input', text: "Comment appelle-t-on la forme de trading algorithmique qui exécute des ordres en microsecondes ?", answer: "HFT" }
+                            ]
+                        },
+                        'expert-2': {
+                            icon: '🪡',
+                            title: "Patterns de Chandeliers (Avancé)",
+                            type: 'standard',
+                            content: `
+                                <h3>Patterns de Renversement</h3>
+                                <p>Les chandeliers forment des 'patterns' (modèles) qui peuvent aider à prédire les renversements de tendance.</p>
+                                <ul>
+                                    <li><strong>Le Marteau (Hammer) :</strong> Apparaît au bas d'une tendance baissière. Il a un petit corps en haut et une longue mèche inférieure. Il signale que les vendeurs ont poussé le prix vers le bas, mais que les acheteurs ont repris la main pour clôturer près de l'ouverture. C'est un signal <strong>haussier</strong>.</li>
+                                    <li><strong>L'Étoile Filante (Shooting Star) :</strong> L'inverse du marteau, en haut d'une tendance haussière. Petit corps en bas, longue mèche supérieure. Signale un rejet des prix plus élevés. C'est un signal <strong>baissier</strong>.</li>
+                                </ul>
+                            `,
+                            questions: [
+                                { type: 'mcq', text: "Un 'Marteau' (Hammer) à la fin d'une tendance baissière est un signal de renversement...", choices: ["Haussier (vers le haut)", "Baissier (vers le bas)", "Neutre", "De volume"], answer: "Haussier (vers le haut)" },
+                                { type: 'mcq', text: "Comment décririez-vous une 'Étoile Filante' (Shooting Star) ?", choices: ["Long corps vert, pas de mèche", "Petit corps en bas, longue mèche supérieure", "Petit corps en haut, longue mèche inférieure", "Long corps rouge, pas de mèche"], answer: "Petit corps en bas, longue mèche supérieure" },
+                                { type: 'input', text: "Si vous voyez un 'Marteau' se former, quelle action devriez-vous envisager ?", answer: "Acheter" }
+                            ]
+                        },
+                        'validation-7': {
+                            icon: '👑',
+                            title: "Validation : Concepts Experts",
+                            type: 'validation',
+                            unitToValidate: 'unit-7',
+                            passRate: 0.8,
+                            questions: []
+                        }
+                    }
                 }
             };
 
@@ -953,7 +1068,16 @@
 
                     'derives-1': 'locked', // U5 L1
                     'derives-2': 'locked',
-                    'validation-5': 'locked' // U5 Validation (Fin du parcours)
+                    'validation-5': 'locked', // U5 Validation
+                    
+                    // --- SECTION 2 : NIVEAU DIFFICILE ---
+                    'avances-1': 'locked', // U6 L1
+                    'avances-2': 'locked',
+                    'validation-6': 'locked', // U6 Validation
+                    
+                    'expert-1': 'locked', // U7 L1
+                    'expert-2': 'locked',
+                    'validation-7': 'locked' // U7 Validation (Fin du parcours)
                 }
             };
             
@@ -1080,7 +1204,12 @@
                         if (lessonStatus === 'completed' && lessonData.type === 'standard') {
                             icon = '✔️';
                         } else if (lessonStatus === 'completed' && lessonData.type === 'validation') {
-                            icon = '🏆';
+                            // Icône différente pour la validation finale
+                            if (lessonId === 'validation-7') {
+                                icon = '🎓'; // Diplômé
+                            } else {
+                                icon = '🏆';
+                            }
                         }
                         
                         lessonNode.innerHTML = `<span>${icon}</span>`;
@@ -1213,7 +1342,7 @@
                     });
                 } else if (question.type === 'input') {
                     questionHTML += 
-                        `<input type="text" id="input-answer" class="input-answer" placeholder="Votre réponse...">`;
+                        `<input type="text" id="input-answer" class="input-answer" placeholder="Votre réponse..." autocapitalize="none" autocomplete="off" autocorrect="off">`;
                 }
                 
                 document.getElementById('question-area').innerHTML = questionHTML;
@@ -1277,7 +1406,7 @@
                     // Pour la pratique ou la validation, on va directement au quiz (via startQuiz)
                     // Pour la pratique, on réutilise les questions de la leçon
                     if (currentSessionType === 'practice') {
-                         currentValidationQuestions = lessonData.questions;
+                         currentValidationQuestions = shuffleArray([...lessonData.questions]); // Mélanger les questions pour la pratique
                     }
                     // Pour la validation, startQuiz génère le set de questions
                     startQuiz(); 
@@ -1313,7 +1442,25 @@
                     });
                 } else if (question.type === 'input') {
                     // Utiliser une vérification flexible (ignore la casse et les espaces superflus)
-                    isCorrect = (selectedAnswer.trim().toLowerCase() === question.answer.toLowerCase());
+                    const normalizedUserAnswer = selectedAnswer.trim().toLowerCase();
+                    const normalizedCorrectAnswer = question.answer.toLowerCase();
+                    
+                    isCorrect = (normalizedUserAnswer === normalizedCorrectAnswer);
+                    
+                    // Gérer les réponses alternatives (ex: 20 ou 20€)
+                    if (question.answer.includes("20")) {
+                        isCorrect = (normalizedUserAnswer === "20" || normalizedUserAnswer === "20€");
+                    }
+                     if (question.answer.includes("HFT")) {
+                        isCorrect = (normalizedUserAnswer === "hft" || normalizedUserAnswer === "trading haute frequence");
+                    }
+                     if (question.answer.includes("Appel de marge")) {
+                        isCorrect = (normalizedUserAnswer === "appel de marge" || normalizedUserAnswer === "margin call");
+                    }
+                    if (question.answer.includes("Acheter")) {
+                        isCorrect = (normalizedUserAnswer === "acheter" || normalizedUserAnswer === "achat");
+                    }
+                    
                     const inputField = document.getElementById('input-answer');
                     if (isCorrect) {
                         inputField.classList.add('correct');
@@ -1346,10 +1493,8 @@
                     feedbackMsg.className = 'incorrect';
                     
                     // Afficher la bonne réponse pour la leçon standard pour permettre à l'utilisateur d'apprendre
-                    if (question.type === 'input') {
+                    if (question.type === 'input' || currentSessionType === 'lesson') {
                         feedbackMsg.innerText = `Dommage. La bonne réponse est : "${question.answer}"`;
-                    } else if (currentSessionType === 'lesson') {
-                        feedbackMsg.innerText = `Dommage. Ce n'est pas correct. Réponse : "${question.answer}"`;
                     } else { // Validation / Practice
                         feedbackMsg.innerText = "Dommage. Ce n'est pas correct.";
                     }
@@ -1430,19 +1575,24 @@
                     isSuccess = correctCount >= passCount;
 
                     if (isSuccess) {
-                        rewardGems = 20;
+                        rewardGems = (currentUnitId === 'unit-7' || currentUnitId === 'unit-6') ? 50 : 20; // Plus de gemmes pour la section 2
                         userData.gems += rewardGems;
                         userData.progress[currentLessonId] = 'completed';
                         handleLessonUnlock(currentLessonId, 'validation');
-                        summaryMessage = `🏆 Validation réussie (${correctCount}/${QUESTIONS_PER_VALIDATION}) ! 💎 +${rewardGems} Gemmes ! L'unité suivante est débloquée.`;
+                        
+                        if (currentLessonId === 'validation-7') {
+                            summaryMessage = `🎓 FÉLICITATIONS ! Vous avez terminé tout le parcours ! 💎 +${rewardGems} Gemmes !`;
+                        } else {
+                            summaryMessage = `🏆 Validation réussie (${correctCount}/${QUESTIONS_PER_VALIDATION}) ! 💎 +${rewardGems} Gemmes ! L'unité suivante est débloquée.`;
+                        }
                     } else {
-                        rewardGems = 5;
+                        rewardGems = (currentUnitId === 'unit-7' || currentUnitId === 'unit-6') ? 10 : 5;
                         userData.gems += rewardGems;
                         btnClass = "incorrect-btn";
                         summaryMessage = `❌ Échec de la Validation (${correctCount}/${QUESTIONS_PER_VALIDATION}). Il fallait ${passCount} bonnes réponses. 💎 +${rewardGems} Gemmes pour la tentative. Révisez et réessayez !`;
                     }
                 } else { // Standard Lesson
-                    rewardGems = 10;
+                    rewardGems = (currentUnitId === 'unit-7' || currentUnitId === 'unit-6') ? 20 : 10; // Plus de gemmes pour la section 2
                     userData.gems += rewardGems;
                     userData.progress[currentLessonId] = 'completed';
                     handleLessonUnlock(currentLessonId, 'standard');
