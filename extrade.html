@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mon Site avec Graphique TradingView</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+        }
+        /* Conteneur pour le widget TradingView */
+        .tradingview-widget-container {
+            max-width: 1200px;
+            margin: 0 auto; /* Centre le conteneur */
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>📈 entraîne-toi a voir les mouvement</h1>
+
+    <div class="tradingview-widget-container">
+      <div id="tradingview_chart_widget"></div>
+
+      <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+      <script type="text/javascript">
+      new TradingView.widget(
+      {
+      "width": "100%", /* Le graphique occupera toute la largeur du conteneur */
+      "height": "700",
+      "symbol": "FX:EURUSD", /* SYMBOLE : Paire de devises Euro/Dollar */
+      "interval": "D", /* INTERVALLE : Jour (Daily) */
+      "timezone": "Europe/Paris",
+      "theme": "light", /* Thème clair */
+      "style": "1", /* Style de graphique (1 = bougies japonaises) */
+      "locale": "fr",
+      "toolbar_bg": "#f1f3f6",
+      "enable_publishing": false,
+      "allow_symbol_change": true,
+      "container_id": "tradingview_chart_widget"
+    }
+      );
+      </script>
+    </div>
+    <p style="margin-top: 20px; color: #666;">Ce graphique est en temps réelle.</p>
+    <p style="margin-top: 20px; color: #666;">Ce graphique est fourni gratuitement par TradingView.</p>
+
+</body>
+</html>
