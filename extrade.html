@@ -1,109 +1,151 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mon Site avec Graphique TradingView</title>
-    <link rel="icon" type="image/png" href="./logo.png">
+    <title>Mon Site avec Graphique TradingView - Thème Dynamique</title>
     <style>
         body {
             font-family: sans-serif;
-            background-color: #f4f4f9;
             margin: 0;
             padding: 20px;
             text-align: center;
+            transition: background-color 0.3s, color 0.3s; /* Transition fluide */
         }
         h1 {
-            color: #333;
             margin-bottom: 30px;
+            transition: color 0.3s;
         }
         /* Conteneur pour le widget TradingView */
         .tradingview-widget-container {
             max-width: 1200px;
-            margin: 0 auto; /* Centre le conteneur */
-            background-color: #ffffff;
+            margin: 20px auto;
             border-radius: 8px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             padding: 10px;
+            transition: background-color 0.3s, box-shadow 0.3s;
         }
-        .footer {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background-color: var(--bg-secondary);
-            border-bottom: 2px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 15px; /* Réduit le padding sur mobile */
-            height: 40px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            z-index: 100;
+        .controls {
+            margin-bottom: 20px;
         }
-        .menu-control{
-            display: block;
-            position: absolute;
-            left: 48.5%;
-            top: 50%;
-            transform: translate(-50%, -50%);
-            margin: 0;
-            width: auto;
-        }
-        #home-btn {
-            background-color: var(--border-color);
-        
-            height: 40px;
-            width: 40px;
-            border-radius: 10px;
-            text-align: center;
-            background: var(--bg-primary);
-            color: var(--text-color);
-            border: 2px solid var(--border-color);
-            padding: 5px 8px; /* Réduit le padding */
+        #theme-toggle {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
             cursor: pointer;
-            font-size: 100%; /* Réduit la taille de police */
-            transition: background-color 0.2s, border-color 0.2s;
-            white-space: nowrap; 
+            font-weight: bold;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        
+        /* COULEURS DU MODE CLAIR */
+        html[data-theme='light'] body {
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        html[data-theme='light'] h1 {
+            color: #1a1a1a;
+        }
+        html[data-theme='light'] .tradingview-widget-container {
+            background-color: #ffffff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        html[data-theme='light'] #theme-toggle {
+            background-color: #007bff;
+            color: white;
         }
 
+        /* COULEURS DU MODE SOMBRE (Par défaut) */
+        html[data-theme='dark'] body {
+            background-color: #1a1a2e; /* Fond très sombre */
+            color: #e0e0e0; /* Texte clair */
+        }
+        html[data-theme='dark'] h1 {
+            color: #ffffff;
+        }
+        html[data-theme='dark'] .tradingview-widget-container {
+            background-color: #16213e;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        }
+        html[data-theme='dark'] #theme-toggle {
+            background-color: #3e2060;
+            color: white;
+        }
     </style>
 </head>
 <body>
 
-    <h1>📈 entraîne-toi a voir les mouvements</h1>
+    <h1>📈 Graphique Avancé EUR/USD (TradingView)</h1>
+
+    <div class="controls">
+        <button id="theme-toggle" onclick="toggleTheme()">Passer en Mode Clair</button>
+    </div>
 
     <div class="tradingview-widget-container">
       <div id="tradingview_chart_widget"></div>
 
       <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
       <script type="text/javascript">
-      new TradingView.widget(
-      {
-      "width": "100%", /* Le graphique occupera toute la largeur du conteneur */
-      "height": "700",
-      "symbol": "FX:EURUSD", /* SYMBOLE : Paire de devises Euro/Dollar */
-      "interval": "D", /* INTERVALLE : Jour (Daily) */
-      "timezone": "Europe/Paris",
-      "theme": "light", /* Thème clair */
-      "style": "1", /* Style de graphique (1 = bougies japonaises) */
-      "locale": "fr",
-      "toolbar_bg": "#f1f3f6",
-      "enable_publishing": false,
-      "allow_symbol_change": true,
-      "container_id": "tradingview_chart_widget"
-    }
-      );
+      
+      let tvWidget = null;
+      let currentTheme = 'dark'; // Thème par défaut
+
+      // Fonction d'initialisation du widget TradingView
+      function initWidget(theme) {
+          // Supprimer l'ancien widget s'il existe
+          const container = document.getElementById('tradingview_chart_widget');
+          container.innerHTML = '';
+          
+          tvWidget = new TradingView.widget(
+          {
+            "width": "100%",
+            "height": "600",
+            "symbol": "FX:EURUSD",
+            "interval": "D",
+            "timezone": "Europe/Paris",
+            "theme": theme, /* Utilise le thème dynamique */
+            "style": "1",
+            "locale": "fr",
+            "toolbar_bg": (theme === 'dark' ? "#2e3b5e" : "#f1f3f6"), // Couleur de la barre d'outils assortie
+            "enable_publishing": false,
+            "allow_symbol_change": true,
+            "container_id": "tradingview_chart_widget"
+          });
+      }
+
+      // Fonction de bascule du thème
+      function toggleTheme() {
+          const htmlElement = document.documentElement;
+          const toggleButton = document.getElementById('theme-toggle');
+
+          if (currentTheme === 'dark') {
+              // Passer au mode clair
+              currentTheme = 'light';
+              htmlElement.setAttribute('data-theme', 'light');
+              toggleButton.innerText = "Passer en Mode Sombre";
+          } else {
+              // Passer au mode sombre
+              currentTheme = 'dark';
+              htmlElement.setAttribute('data-theme', 'dark');
+              toggleButton.innerText = "Passer en Mode Clair";
+          }
+
+          // Recharger le widget avec le nouveau thème
+          if (tvWidget) {
+             initWidget(currentTheme);
+          }
+      }
+
+      // Initialiser le widget au chargement de la page avec le thème par défaut
+      document.addEventListener('DOMContentLoaded', () => {
+          initWidget(currentTheme);
+          // Mettre le texte du bouton correctement au chargement
+          document.getElementById('theme-toggle').innerText = "Passer en Mode Clair";
+      });
+
       </script>
     </div>
-    <p style="margin-top: 20px; color: #666;">Ce graphique est en temps réelle.</p>
-    <p style="margin-top: 20px; color: #666;">Ce graphique est fourni gratuitement par TradingView.</p>
-    <footer class="footer">
-        <div class="menu-control">
-            <a href="index.html"><button id="home-btn">🏠</button></a>
-            <a href="extrade.html"><button id="home-btn">💸</button></a>
-        </div>
-    </footer>
-</body>
 
+    <p style="margin-top: 20px;">Ce graphique est fourni gratuitement par TradingView.</p>
+
+</body>
 </html>
