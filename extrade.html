@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mon Site avec Graphique TradingView</title>
+    <link rel="icon" type="image/png" href="./logo.png">
     <style>
         body {
             font-family: sans-serif;
@@ -25,11 +26,52 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             padding: 10px;
         }
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--bg-secondary);
+            border-bottom: 2px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px; /* Réduit le padding sur mobile */
+            height: 40px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            z-index: 100;
+        }
+        .menu-control{
+            display: block;
+            position: absolute;
+            left: 48.5%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            margin: 0;
+            width: auto;
+        }
+        #home-btn {
+            background-color: var(--border-color);
+        
+            height: 40px;
+            width: 40px;
+            border-radius: 10px;
+            text-align: center;
+            background: var(--bg-primary);
+            color: var(--text-color);
+            border: 2px solid var(--border-color);
+            padding: 5px 8px; /* Réduit le padding */
+            cursor: pointer;
+            font-size: 100%; /* Réduit la taille de police */
+            transition: background-color 0.2s, border-color 0.2s;
+            white-space: nowrap; 
+        }
+
     </style>
 </head>
 <body>
 
-    <h1>📈 entraîne-toi a voir les mouvement</h1>
+    <h1>📈 entraîne-toi a voir les mouvements</h1>
 
     <div class="tradingview-widget-container">
       <div id="tradingview_chart_widget"></div>
@@ -56,6 +98,12 @@
     </div>
     <p style="margin-top: 20px; color: #666;">Ce graphique est en temps réelle.</p>
     <p style="margin-top: 20px; color: #666;">Ce graphique est fourni gratuitement par TradingView.</p>
-
+    <footer class="footer">
+        <div class="menu-control">
+            <a href="index.html"><button id="home-btn">🏠</button></a>
+            <a href="extrade.html"><button id="home-btn">💸</button></a>
+        </div>
+    </footer>
 </body>
+
 </html>
