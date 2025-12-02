@@ -1,0 +1,1570 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TradeLingo - Analyse Avancée</title>
+    <link rel="icon" type="image/png" href="./logo.png">
+    
+    <style>
+        /* Variables de couleur pour le Mode Clair */
+        :root {
+            --bg-primary: #f0f4f8;
+            --bg-secondary: #ffffff;
+            --text-color: #333;
+            --text-secondary: #666;
+            --border-color: #e5e5e5;
+
+            --green: #58a700;
+            --green-dark: #468400;
+            --red: #ea2b2b;
+            --blue: #007bff;
+            --blue-light: #d7eaff;
+            --gold: #ffc107;
+            --gold-dark: #c79100;
+            --btn-disabled-bg: #e0e0e0;
+            --btn-disabled-border: #c9c9c9;
+            --purple: #6f42c1;
+            --purple-dark: #4e2f89;
+            --grey-light: #f0f4f8; 
+        }
+
+        /* Variables de couleur pour le Mode Sombre */
+        body.dark-mode {
+            --bg-primary: #121212;
+            --bg-secondary: #1e1e1e;
+            --text-color: #f0f0f0;
+            --text-secondary: #aaaaaa;
+            --border-color: #333333;
+            --grey-light: #2c2c2c; 
+
+            --btn-disabled-bg: #444444;
+            --btn-disabled-border: #666666;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-primary);
+            margin: 0;
+            padding-top: 70px; /* Espace pour le header fixe */
+            padding-bottom: 20px;
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* 1. Header (Identique à index.html) */
+        .top-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--bg-secondary);
+            border-bottom: 2px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            height: 50px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            z-index: 100;
+        }
+        .stats-group {
+            display: flex;
+            gap: 10px;
+        }
+        .stat {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+        }
+        .stat span {
+            margin-left: 5px;
+            min-width: 15px;
+        }
+        .stat-icon {
+            font-size: 1.3rem;
+        }
+        .stat-icon-green { color: var(--green); }
+        .stat-icon-red { color: var(--red); }
+        .stat-icon-blue { color: var(--blue); }
+
+        .titre {
+            display: none;
+        }
+
+        /* Contrôles du Header (Identique) */
+        .header-controls {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+        }
+        #dark-mode-toggle {
+            margin-right: 30px;
+        }
+        #dark-mode-toggle, #admin-unlock-btn {
+            width: 35px;
+            height: 35px;
+            
+            background: var(--bg-primary);
+            color: var(--text-color);
+            border: 2px solid var(--border-color);
+            padding: 5px 8px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: background-color 0.2s, border-color 0.2s;
+            white-space: nowrap; 
+            
+        }
+        #dark-mode-toggle:hover, #admin-unlock-btn:hover {
+            background-color: var(--border-color);
+        }
+        #admin-unlock-btn {
+            color: var(--purple);
+            border-color: var(--purple-dark);
+        }
+
+        /* 2. Parcours d'apprentissage (Identique) */
+        .learning-path {
+            padding: 20px 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+        .unit-container {
+            width: 95%; 
+            max-width: 400px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        .unit-title {
+            background-color: var(--green);
+            color: var(--bg-secondary);
+            padding: 8px;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        
+        /* Styles pour les NOUVELLES unités */
+        .unit-container:nth-child(1) .unit-title { 
+            background: linear-gradient(45deg, var(--green-dark), var(--blue));
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+        .unit-container:nth-child(2) .unit-title { 
+            background: linear-gradient(45deg, var(--purple-dark), var(--gold-dark));
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+
+        .lesson-node {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 4px solid;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin: 8px auto;
+            position: relative;
+        }
+        
+        .lesson-node.validation {
+            font-size: 1.8rem;
+            margin-top: 25px; 
+            border-style: dashed;
+        }
+        
+        .connector {
+            height: 25px;
+            width: 3px;
+            background-color: var(--border-color);
+            margin: -4px auto;
+            border-radius: 2px;
+        }
+        .validation-connector {
+            height: 10px;
+            margin: 0 auto;
+            background-color: transparent;
+            border-left: 2px dashed var(--border-color);
+        }
+        
+        /* États des leçons (Identique) */
+        .lesson-node.locked {
+            background-color: var(--grey-light, #d1d1d1); 
+            border-color: #b0b0b0;
+            color: #b0b0b0;
+            cursor: not-allowed;
+        }
+        .lesson-node.active, .lesson-node.completed, .lesson-node.validation.active {
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        .lesson-node.active:hover, .lesson-node.completed:hover, .lesson-node.validation.active:hover {
+            transform: scale(1.05);
+        }
+        .lesson-node.active {
+            background-color: var(--green);
+            border-color: var(--green-dark);
+            color: var(--bg-secondary);
+        }
+        .lesson-node.completed {
+            background-color: var(--gold);
+            border-color: var(--gold-dark);
+            color: var(--bg-secondary);
+        }
+
+        /* 3. Modal de Leçon (Identique) */
+        .lesson-modal {
+            display: none; 
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            z-index: 200;
+            justify-content: center;
+            align-items: center;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        .lesson-content {
+            background-color: var(--bg-secondary);
+            color: var(--text-color);
+            border-radius: 0;
+            width: 100%;
+            max-width: 100%;
+            height: 100%;
+            box-shadow: none; 
+            display: flex;
+            flex-direction: column;
+            max-height: 100vh;
+            position: relative; 
+            transition: background-color 0.3s;
+        }
+        #lesson-header {
+            padding: 15px;
+            border-bottom: 2px solid var(--border-color);
+        }
+        #lesson-title {
+            margin: 0;
+            font-size: 1.3rem;
+            color: var(--text-color);
+        }
+        #close-lesson-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: none;
+            border: none;
+            font-size: 1.8rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+            padding: 5px;
+            transition: color 0.2s;
+            line-height: 1;
+        }
+        #close-lesson-btn:hover {
+            color: var(--red);
+        }
+
+        #lesson-body-container {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 0 15px;
+        }
+
+        /* Contenu du cours/Explications */
+        .course-explanation {
+            padding: 15px 0;
+            line-height: 1.5;
+        }
+        .course-explanation h3 {
+            color: var(--green-dark);
+            margin-top: 0;
+            font-size: 1.3rem;
+        }
+        body.dark-mode .course-explanation h3 {
+            color: var(--green);
+        }
+        .course-explanation p, .course-explanation ul {
+            margin-bottom: 10px;
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+        }
+        .course-explanation strong {
+            color: var(--text-color);
+        }
+        .explanation-next-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: bold;
+            color: var(--bg-secondary);
+            background-color: var(--blue);
+            border-bottom: 3px solid #0056b3;
+            cursor: pointer;
+            transition: background-color 0.1s;
+            margin-top: 15px;
+        }
+        .explanation-next-btn:hover {
+            background-color: #0069d9;
+        }
+        
+        /* Questions (Identique) */
+        #question-area {
+            display: none; 
+            padding: 15px 0;
+        }
+        #question-text {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: var(--text-color);
+        }
+        
+        /* 4. Types de Questions (Identique) */
+        
+        /* QCM */
+        .choice-button {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            background-color: var(--grey-light);
+            border: 2px solid var(--border-color);
+            border-bottom-width: 3px;
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: left;
+            font-size: 0.95rem;
+            font-weight: bold;
+            transition: all 0.1s ease;
+            color: var(--text-color);
+        }
+        .choice-button:not(:disabled):hover {
+            background-color: var(--border-color);
+        }
+        .choice-button.selected {
+            background-color: var(--blue-light);
+            border: 2px solid var(--blue);
+            border-bottom-width: 3px;
+        }
+        .choice-button:disabled {
+            cursor: not-allowed;
+            opacity: 0.8;
+        }
+        
+        /* Champ de texte */
+        .input-answer {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin-top: 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 1rem;
+            box-sizing: border-box; 
+            background-color: var(--bg-secondary);
+            color: var(--text-color);
+        }
+        .input-answer.correct {
+            border-color: var(--green);
+            background-color: #d7ffb8;
+        }
+        .input-answer.incorrect {
+            border-color: var(--red);
+            background-color: #ffe2e2;
+        }
+        body.dark-mode .input-answer.correct {
+            background-color: #213c00; 
+            color: var(--text-color);
+        }
+        body.dark-mode .input-answer.incorrect {
+            background-color: #4d0000;
+            color: var(--text-color);
+        }
+
+        /* === NOUVEAUX STYLES pour Images et Vidéos === */
+        .course-explanation img {
+            width: 100%;
+            max-width: 400px;
+            border-radius: 10px;
+            margin: 10px 0;
+            border: 2px solid var(--border-color);
+        }
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+            height: 0;
+            overflow: hidden;
+            max-width: 100%;
+            background: #000;
+            margin: 15px 0;
+            border-radius: 10px;
+            border: 2px solid var(--border-color);
+        }
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        /* ============================================= */
+
+
+        /* 5. Footer de Feedback (Identique) */
+        .feedback-footer {
+            padding: 15px;
+            background-color: var(--grey-light);
+            border-top: 2px solid var(--border-color);
+            border-radius: 0;
+            transition: background-color 0.3s ease;
+        }
+        .feedback-footer.correct {
+            background-color: #d7ffb8; 
+        }
+        .feedback-footer.incorrect {
+            background-color: #ffe2e2; 
+        }
+        body.dark-mode .feedback-footer.correct { background-color: #213c00; }
+        body.dark-mode .feedback-footer.incorrect { background-color: #4d0000; }
+        
+        #feedback-message {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        #feedback-message.correct { color: var(--green-dark); }
+        #feedback-message.incorrect { color: var(--red); }
+        
+        .footer-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: bold;
+            color: var(--bg-secondary);
+            cursor: pointer;
+            border-bottom-width: 3px;
+            border-bottom-style: solid;
+            transition: all 0.1s ease;
+        }
+        .footer-btn:not(:disabled):hover {
+            filter: brightness(1.05);
+        }
+        
+        .footer-btn#check-answer-btn:not(:disabled) {
+            background-color: var(--green);
+            border-color: var(--green-dark);
+            color: var(--bg-secondary);
+        }
+
+        .footer-btn.correct-btn {
+            background-color: var(--green);
+            border-color: var(--green-dark);
+        }
+        .footer-btn.incorrect-btn {
+            background-color: var(--red);
+            border-color: #b02121;
+        }
+        
+        /* === MODIFICATION FOOTER (PAGE 2) === */
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--bg-secondary);
+            border-bottom: 2px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            height: 40px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            z-index: 100;
+        }
+        .menu-control{
+            display: block;
+            position: absolute;
+            left: 48.5%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            margin: 0;
+            width: auto;
+        }
+        /* Style pour les boutons du footer */
+        #home-btn, #extrade-btn {
+            background-color: var(--border-color);
+            height: 40px;
+            width: 40px;
+            border-radius: 10px;
+            text-align: center;
+            background: var(--bg-primary);
+            color: var(--text-color);
+            border: 2px solid var(--border-color);
+            padding: 5px 8px;
+            cursor: pointer;
+            font-size: 100%;
+            transition: background-color 0.2s, border-color 0.2s;
+            white-space: nowrap; 
+        }
+        /* Style pour le bouton ACTIF */
+        #extrade-btn.active-page {
+            background-color: var(--blue);
+            color: white;
+            border-color: #0056b3;
+        }
+        .footer-btn-group {
+            display: flex;
+            gap: 10px;
+        }
+        /* ================================== */
+
+
+        /* ---------------------------------------------------- */
+        /* MEDIA QUERIES (Identiques) */
+        /* ---------------------------------------------------- */
+        @media (min-width: 600px) {
+            body {
+                padding-top: 80px;
+            }
+
+            .top-bar {
+                padding: 10px 30px;
+                height: 60px;
+            }
+
+            .stats-group {
+                gap: 20px;
+            }
+
+            .stat {
+                font-size: 1.2rem;
+            }
+            .stat span {
+                margin-left: 8px;
+                min-width: 20px;
+            }
+            .stat-icon {
+                font-size: 1.5rem;
+            }
+            .titre {
+                display: block;
+                position: absolute;
+                left: 48.5%;
+                top: 50%;
+                transform: translate(-50%, -50%);
+                margin: 0;
+                width: auto;
+            }
+ 
+            }
+            #dark-mode-toggle {
+                 margin-right: 50px;
+            }
+            #dark-mode-toggle, #admin-unlock-btn {
+                height: 40px;
+                width: 40px;
+                padding: 8px 15px;
+                font-size: 1rem;
+                border-radius: 10px;
+                text-align: center;
+            }
+            
+            .learning-path {
+                padding: 30px 20px;
+            }
+
+            .lesson-node {
+                width: 70px;
+                height: 70px;
+                border: 6px solid;
+                font-size: 2.5rem;
+                margin: 10px auto;
+            }
+            .connector {
+                height: 30px;
+                width: 4px;
+                margin: -5px auto;
+            }
+            .lesson-node.validation {
+                font-size: 2rem;
+            }
+            
+            .lesson-content {
+                border-radius: 15px;
+                width: 90%;
+                max-width: 500px;
+                height: auto;
+                max-height: 90vh;
+                box-shadow: 0 5px 20px rgba(0,0,0,0.25);
+            }
+
+            #lesson-header {
+                padding: 20px;
+            }
+            #lesson-title {
+                font-size: 1.5rem;
+            }
+            
+            #close-lesson-btn {
+                top: 10px;
+                right: 10px;
+                font-size: 1.5rem;
+            }
+
+            #lesson-body-container {
+                padding: 0 25px;
+            }
+
+            .course-explanation {
+                padding: 25px 0;
+            }
+            .course-explanation h3 {
+                font-size: 1.4rem;
+            }
+            .course-explanation p, .course-explanation ul {
+                font-size: 1rem;
+            }
+
+            .explanation-next-btn, .footer-btn, .choice-button {
+                padding: 15px;
+                font-size: 1.1rem;
+                border-radius: 12px;
+            }
+            .explanation-next-btn, .footer-btn {
+                border-bottom-width: 4px;
+            }
+            .choice-button {
+                border-bottom-width: 4px;
+            }
+
+            .feedback-footer {
+                padding: 20px;
+                border-radius: 0 0 15px 15px;
+            }
+            
+            #feedback-message {
+                font-size: 1.2rem;
+            }
+        
+    </style>
+</head>
+
+<body class="light-mode">
+
+    <header class="top-bar">
+        <div class="stats-group">
+            <div class="stat">
+                <span class="stat-icon stat-icon-green">🔥</span>
+                <span id="streak-count">0</span>
+            </div>
+            <div class="stat">
+                <span class="stat-icon stat-icon-blue">💎</span>
+                <span id="gem-count">100</span>
+            </div>
+            <div class="stat">
+                <span class="stat-icon stat-icon-red">❤️</span>
+                <span id="life-count">5</span>
+            </div>
+        </div>
+        <div class="titre">
+            <h1>TRADLINGO</h1>
+        </div>
+        <div class="header-controls">
+            <button id="admin-unlock-btn" title="Débloquer toutes les leçons (Mode Dev)">🔓</button>
+            <button id="dark-mode-toggle" title="Basculer le thème">🌙</button>
+        </div>
+    </header>
+
+    <main class="learning-path" id="learning-path">
+        </main>
+
+    <div class="lesson-modal" id="lesson-modal">
+        <div class="lesson-content">
+            <button id="close-lesson-btn" title="Fermer la leçon">✕</button>
+            <header id="lesson-header">
+                <h2 id="lesson-title">Titre de la leçon</h2>
+            </header>
+            <div id="lesson-body-container">
+                </div>
+            <footer class="feedback-footer" id="feedback-footer">
+                </footer>
+        </div>
+    </div>
+    
+    <footer class="footer">
+        <div class="menu-control footer-btn-group">
+            <a href="index.html"><button id="home-btn">🏠</button></a>
+            <a href="extrade.html"><button id="extrade-btn" class="active-page">📈</button></a>
+        </div>
+    </footer>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // --- Constantes (Identiques) ---
+            const LIFE_MAX = 5;
+            const LIFE_PACK_COST = 100;
+            const LIFE_PACK_AMOUNT = 5;
+            const QUESTIONS_PER_VALIDATION = 5;
+            
+            // --- NOUVELLE CONSTANTE pour la première leçon de cette page ---
+            const FIRST_ADVANCED_LESSON_ID = 'analyse-adv-1';
+            // --- ID de la leçon finale de la Page 1 (pour le déblocage) ---
+            const UNLOCK_REQUIREMENT_ID = 'validation-7';
+
+
+            // --- 1. NOUVELLE Base de Données des Cours (Unités 8 & 9) ---
+            const courseContent = {
+                'unit-8': {
+                    title: "Unité 8 : Support & Résistance",
+                    lessons: {
+                        'analyse-adv-1': {
+                            icon: '⚖️',
+                            title: "Support et Résistance",
+                            type: 'standard',
+                            content: `
+                                <h3>Support & Résistance</h3>
+                                <p>Les <strong>Supports</strong> et <strong>Résistances</strong> sont les concepts les plus fondamentaux de l'analyse technique.</p>
+                                <ul>
+                                    <li>Un <strong>Support</strong> est un niveau de prix où une tendance baissière peut s'arrêter en raison d'une concentration de la demande (acheteurs).</li>
+                                    <li>Une <strong>Résistance</strong> est un niveau de prix où une tendance haussière peut s'arrêter en raison d'une concentration de l'offre (vendeurs).</li>
+                                </ul>
+                                <p>Quand un prix casse une résistance, celle-ci devient souvent un nouveau support. Inversement, quand un support est cassé, il devient souvent une nouvelle résistance.</p>
+                                                            `,
+                            questions: [
+                                { type: 'mcq', text: "Un niveau de prix où les acheteurs sont forts et arrêtent une baisse est appelé...", choices: ["Résistance", "Support", "Fibonacci", "Moyenne Mobile"], answer: "Support" },
+                                { type: 'mcq', text: "Que se passe-t-il souvent lorsqu'une ancienne résistance est cassée ?", choices: ["Elle disparaît", "Elle devient un nouveau support", "Elle devient une résistance plus forte", "Le marché s'inverse"], answer: "Elle devient un nouveau support" },
+                                { type: 'input', text: "Comment appelle-t-on un niveau de prix qui empêche le cours de monter plus haut ?", answer: "Résistance" }
+                            ]
+                        },
+                        'analyse-adv-2': {
+                            icon: '📈',
+                            title: "Tracer les Lignes de Tendance",
+                            type: 'standard',
+                            content: `
+                                <h3>Lignes de Tendance (Trendlines)</h3>
+                                <p>Les lignes de tendance sont une forme de support/résistance dynamique.</p>
+                                <ul>
+                                    <li>Une <strong>ligne de tendance haussière</strong> se trace en reliant au moins deux points bas (creux) de plus en plus hauts. Elle agit comme un support dynamique.</li>
+                                    <li>Une <strong>ligne de tendance baissière</strong> se trace en reliant au moins deux points hauts (sommets) de plus en plus bas. Elle agit comme une résistance dynamique.</li>
+                                </ul>
+                                <p>Tant que le prix reste au-dessus de la ligne de tendance haussière, la tendance est considérée comme intacte.</p>
+                                                                
+                                <h4>Vidéo d'exemple</h4>
+                                <p>Regardez cette vidéo pour voir comment tracer des lignes de tendance (exemple fictif).</p>
+                                <div class="video-container">
+                                    <iframe src="https://www.youtube.com/embed/vPS-t6N_g7s" title="Exemple de Lignes de Tendance" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                </div>
+                            `,
+                            questions: [
+                                { type: 'mcq', text: "Comment trace-t-on une ligne de tendance haussière ?", choices: ["En reliant des sommets", "En reliant des creux (points bas)", "Horizontalement", "Verticalement"], answer: "En reliant des creux (points bas)" },
+                                { type: 'input', text: "Une ligne de tendance baissière agit comme une... dynamique.", answer: "Résistance" }
+                            ]
+                        },
+                        'validation-8': {
+                            icon: '⭐',
+                            title: "Validation : Support & Résistance",
+                            type: 'validation',
+                            unitToValidate: 'unit-8',
+                            passRate: 0.8,
+                            questions: []
+                        }
+                    }
+                },
+                'unit-9': {
+                    title: "Unité 9 : Retracements de Fibonacci",
+                    lessons: {
+                        'analyse-adv-3': {
+                            icon: '🌀',
+                            title: "Introduction à Fibonacci",
+                            type: 'standard',
+                            content: `
+                                <h3>Les Retracements de Fibonacci</h3>
+                                <p>Cet outil d'analyse technique utilise des ratios mathématiques (dérivés de la suite de Fibonacci) pour identifier des niveaux potentiels de support ou de résistance.</p>
+                                <p>Après un mouvement de prix important (une 'impulsion'), le prix retrace souvent une partie de ce mouvement avant de continuer dans la direction de la tendance. L'outil de Fibonacci aide à anticiper où ce retracement pourrait s'arrêter.</p>
+                                <p>Les niveaux de retracement clés sont <strong>23.6%</strong>, <strong>38.2%</strong>, <strong>50%</strong>, <strong>61.8%</strong>, et <strong>78.6%</strong>.</p>
+                                                            `,
+                            questions: [
+                                { type: 'mcq', text: "Quel est l'objectif principal des retracements de Fibonacci ?", choices: ["Prédire la date exacte d'un crash", "Identifier des niveaux potentiels de support/résistance après une impulsion", "Calculer les bénéfices d'une entreprise", "Remplacer les Stop Loss"], answer: "Identifier des niveaux potentiels de support/résistance après une impulsion" },
+                                { type: 'mcq', text: "Lequel de ces pourcentages est un niveau de retracement de Fibonacci clé ?", choices: ["10%", "61.8%", "75%", "99%"], answer: "61.8%" },
+                                { type: 'input', text: "Après une forte tendance haussière, le prix 'retrace' souvent. L'outil de Fibonacci aide à trouver des zones de... potentielles.", answer: "Support" }
+                            ]
+                        },
+                        'analyse-adv-4': {
+                            icon: '🎯',
+                            title: "Utiliser Fibonacci en Pratique",
+                            type: 'standard',
+                            content: `
+                                <h3>Comment tracer Fibonacci</h3>
+                                <p>Pour l'utiliser, vous devez identifier un mouvement de tendance clair (une 'jambe' de hausse ou de baisse).</p>
+                                <ul>
+                                    <li>Dans une <strong>tendance haussière</strong>, vous tracez l'outil du point le plus bas (Swing Low) au point le plus haut (Swing High). Les niveaux de retracement (38.2%, 50%, 61.8%) agiront comme des <strong>supports</strong> potentiels.</li>
+                                    <li>Dans une <strong>tendance baissière</strong>, vous tracez l'outil du point le plus haut (Swing High) au point le plus bas (Swing Low). Les niveaux agiront comme des <strong>résistances</strong> potentielles.</li>
+                                </ul>
+                                <h4>Vidéo d'application</h4>
+                                <div class="video-container">
+                                    <iframe width="967" height="519" src="https://www.youtube.com/embed/yiNneSUNbVI" title="Le Retracement de Fibonacci expliqué en moins de 5 minutes" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen; referrerpolicy="strict-origin-when-cross-origin"></iframe>
+                                </div>
+                            `,
+                            questions: [
+                                { type: 'mcq', text: "Dans une tendance haussière, pour trouver des supports, vous tracez l'outil Fibonacci...", choices: ["Du haut vers le bas", "Du bas vers le haut", "De gauche à droite", "Peu importe"], answer: "Du bas vers le haut" },
+                                { type: 'input', text: "Dans une tendance baissière, les niveaux de Fibonacci 38.2% et 61.8% agissent comme des zones de... potentielles.", answer: "Résistance" }
+                            ]
+                        },
+                        'validation-9': {
+                            icon: '👑',
+                            title: "Validation : Analyse Avancée",
+                            type: 'validation',
+                            unitToValidate: 'unit-9',
+                            passRate: 0.8,
+                            questions: []
+                        }
+                    }
+                }
+            };
+
+
+            // --- 2. Données de l'Utilisateur (MODIFIÉ) ---
+            // Le defaultUserData doit maintenant inclure la progression des DEUX pages
+            // pour que la fonction de fusion (loadUserData) fonctionne correctement.
+            const defaultUserData = {
+                streak: 0,
+                gems: 100,
+                lives: 5,
+                progress: { 
+                    // --- PROGRÈS PAGE 1 (pour référence) ---
+                    'bases-1': 'active',
+                    'bases-2': 'locked',
+                    'bases-3': 'locked', 
+                    'validation-1': 'locked',
+                    'analyse-1': 'locked',
+                    'analyse-2': 'locked',
+                    'analyse-3': 'locked', 
+                    'validation-2': 'locked',
+                    'risque-1': 'locked',
+                    'risque-2': 'locked',
+                    'risque-3': 'locked',
+                    'validation-3': 'locked',
+                    'psycho-1': 'locked',
+                    'psycho-2': 'locked',
+                    'validation-4': 'locked',
+                    'derives-1': 'locked',
+                    'derives-2': 'locked',
+                    'validation-5': 'locked',
+                    'avances-1': 'locked',
+                    'avances-2': 'locked',
+                    'validation-6': 'locked',
+                    'expert-1': 'locked',
+                    'expert-2': 'locked',
+                    'validation-7': 'locked', // Leçon requise
+                    
+                    // --- NOUVEAU PROGRÈS PAGE 2 ---
+                    'analyse-adv-1': 'locked', // U8 L1
+                    'analyse-adv-2': 'locked',
+                    'validation-8': 'locked', // U8 Val
+                    
+                    'analyse-adv-3': 'locked', // U9 L1
+                    'analyse-adv-4': 'locked',
+                    'validation-9': 'locked'  // U9 Val (Fin Page 2)
+                }
+            };
+            
+            // Le reste de la logique JS est presque identique à index.html
+            // Seules les sections modifiées sont commentées.
+
+            let userData = loadUserData();
+
+            // --- 3. Références aux éléments du DOM (Identique) ---
+            const bodyEl = document.body;
+            const darkModeToggle = document.getElementById('dark-mode-toggle');
+            const adminUnlockBtn = document.getElementById('admin-unlock-btn'); 
+            const learningPathEl = document.getElementById('learning-path');
+            const lessonModalEl = document.getElementById('lesson-modal');
+            const lessonTitleEl = document.getElementById('lesson-title');
+            const lessonBodyContainerEl = document.getElementById('lesson-body-container');
+            const feedbackFooterEl = document.getElementById('feedback-footer');
+            const closeLessonBtn = document.getElementById('close-lesson-btn');
+            
+            const lifeCountEl = document.getElementById('life-count');
+            const gemCountEl = document.getElementById('gem-count');
+            const streakCountEl = document.getElementById('streak-count');
+
+            // --- 4. Variables d'état du jeu (Identique) ---
+            let currentLessonId = null;
+            let currentUnitId = null;
+            let currentQuestionIndex = 0;
+            let selectedAnswer = null;
+            let currentSessionType = 'lesson';
+            let isExplaining = false; 
+            let currentValidationQuestions = [];
+            let lastAttemptWasIncorrect = false;
+
+            // --- Utilitaires (Identique) ---
+            function shuffleArray(array) {
+                for (let i = array.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [array[i], array[j]] = [array[j], array[i]];
+                }
+                return array;
+            }
+
+            // --- 5. Fonctions de Gestion des Données (Identique) ---
+
+            function loadUserData() {
+                const savedData = localStorage.getItem('tradeLingoUser');
+                if (savedData) {
+                    const parsedData = JSON.parse(savedData);
+                    // La fusion garantit que les nouvelles leçons (analyse-adv-X) sont
+                    // ajoutées aux données sauvegardées de l'utilisateur.
+                    const mergedProgress = { ...defaultUserData.progress, ...parsedData.progress };
+                    return { ...defaultUserData, ...parsedData, progress: mergedProgress };
+                }
+                return { ...defaultUserData };
+            }
+
+            function saveUserData() {
+                localStorage.setItem('tradeLingoUser', JSON.stringify(userData));
+            }
+
+            // --- 6. Fonctions de Rendu (Identique) ---
+
+            function initializeDarkMode() {
+                const savedMode = localStorage.getItem('themeMode') || 'light-mode';
+                bodyEl.className = savedMode;
+                    darkModeToggle.style.display = 'flex';
+                    darkModeToggle.style.alignItems = 'center';
+                    darkModeToggle.style.justifyContent = 'center';
+                    adminUnlockBtn.style.padding = '0';
+                darkModeToggle.innerText = savedMode === 'dark-mode' ? '☀️' : '🌙';
+            }
+
+            function toggleDarkMode() {
+                if (bodyEl.classList.contains('light-mode')) {
+                    bodyEl.className = 'dark-mode';
+                    localStorage.setItem('themeMode', 'dark-mode');
+                    darkModeToggle.innerText = '☀️';
+                } else {
+                    bodyEl.className = 'light-mode';
+                    localStorage.setItem('themeMode', 'light-mode');
+                    darkModeToggle.innerText = '🌙';
+                }
+            }
+
+
+            function updateStatsUI() {
+                lifeCountEl.innerText = userData.lives;
+                gemCountEl.innerText = userData.gems;
+                streakCountEl.innerText = userData.streak;
+            }
+
+            function renderLearningPath() {
+                learningPathEl.innerHTML = ''; 
+                
+                // Cette fonction va maintenant générer les Unités 8 et 9
+                // car c'est ce qui est dans la variable 'courseContent' de CETTE page.
+                for (const [unitId, unitData] of Object.entries(courseContent)) {
+                    const unitDiv = document.createElement('div');
+                    unitDiv.className = 'unit-container';
+                    unitDiv.innerHTML = `<h3 class="unit-title">${unitData.title}</h3>`;
+                    
+                    let isFirstLesson = true;
+                    for (const [lessonId, lessonData] of Object.entries(unitData.lessons)) {
+                        const lessonStatus = userData.progress[lessonId] || 'locked'; 
+                        
+                        if (!isFirstLesson) {
+                            const connector = document.createElement('div');
+                            connector.className = lessonData.type === 'validation' ? 'validation-connector' : 'connector';
+                            unitDiv.appendChild(connector);
+                        }
+                        isFirstLesson = false;
+                        
+                        const lessonNode = document.createElement('div');
+                        lessonNode.className = `lesson-node ${lessonStatus} ${lessonData.type === 'validation' ? 'validation' : ''}`;
+                        lessonNode.dataset.lessonId = lessonId;
+                        lessonNode.dataset.unitId = unitId; 
+                        
+                        let icon = lessonData.icon;
+                        if (lessonStatus === 'completed' && lessonData.type === 'standard') {
+                            icon = '✔️';
+                        } else if (lessonStatus === 'completed' && lessonData.type === 'validation') {
+                            // Icône de fin de parcours
+                            if (lessonId === 'validation-9') {
+                                icon = '🎓'; 
+                            } else {
+                                icon = '🏆';
+                            }
+                        }
+                        
+                        lessonNode.innerHTML = `<span>${icon}</span>`;
+
+                        if (lessonStatus !== 'locked') {
+                            lessonNode.addEventListener('click', () => startLesson(unitId, lessonId));
+                        }
+                        unitDiv.appendChild(lessonNode);
+                    }
+                    learningPathEl.appendChild(unitDiv);
+                }
+            }
+            
+            // --- 7. Fonctions de Logique de Jeu (Identique) ---
+            
+            function generateValidationQuestions(unitId) {
+                let allQuestions = [];
+                const unit = courseContent[unitId];
+                
+                for (const lessonId in unit.lessons) {
+                    const lesson = unit.lessons[lessonId];
+                    if (lesson.type === 'standard' && lesson.questions) {
+                        allQuestions.push(...lesson.questions);
+                    }
+                }
+                return shuffleArray(allQuestions).slice(0, QUESTIONS_PER_VALIDATION);
+            }
+
+            function loadExplanation() {
+                isExplaining = true;
+                feedbackFooterEl.innerHTML = ''; 
+                feedbackFooterEl.className = 'feedback-footer';
+
+                const lesson = courseContent[currentUnitId].lessons[currentLessonId];
+                lessonTitleEl.innerText = lesson.title;
+
+                lessonBodyContainerEl.innerHTML = `
+                    <div class="course-explanation">
+                        ${lesson.content}
+                        <button class="explanation-next-btn" id="start-quiz-btn">Commencer l'exercice</button>
+                    </div>
+                    <div id="question-area"></div>
+                `;
+                
+                document.getElementById('start-quiz-btn').addEventListener('click', startQuiz);
+            }
+            
+            function startQuiz() {
+                isExplaining = false;
+                lastAttemptWasIncorrect = false; 
+                
+                if (currentSessionType === 'validation') {
+                    const lessonData = courseContent[currentUnitId].lessons[currentLessonId];
+                    currentValidationQuestions = generateValidationQuestions(lessonData.unitToValidate);
+                    lessonTitleEl.innerText = lessonData.title;
+                    lessonBodyContainerEl.innerHTML = `
+                        <div class="course-explanation">
+                            <h3>Test de Maîtrise</h3>
+                            <p>Ce test évalue votre maîtrise de l'Unité ${lessonData.unitToValidate.slice(-1)}. Vous devez obtenir ${lessonData.passRate * 100}% de bonnes réponses.</p>
+                            <p>Bonne chance !</p>
+                            <button class="explanation-next-btn" id="start-quiz-btn">Démarrer le Test de ${QUESTIONS_PER_VALIDATION} Questions</button>
+                        </div>
+                        <div id="question-area"></div>
+                    `;
+                    document.getElementById('start-quiz-btn').addEventListener('click', () => {
+                        document.querySelector('.course-explanation').style.display = 'none';
+                        document.getElementById('question-area').style.display = 'block';
+                        loadQuestion();
+                    });
+                } else {
+                    document.querySelector('.course-explanation').style.display = 'none';
+                    document.getElementById('question-area').style.display = 'block';
+                    loadQuestion();
+                }
+            }
+
+
+            function loadQuestion() {
+                selectedAnswer = null;
+                feedbackFooterEl.innerHTML = `<button class="footer-btn" id="check-answer-btn">Vérifier</button>`;
+                feedbackFooterEl.className = 'feedback-footer'; 
+
+                const checkAnswerBtn = document.getElementById('check-answer-btn');
+                checkAnswerBtn.disabled = true;
+                checkAnswerBtn.addEventListener('click', checkAnswer);
+
+                let questionsArray;
+                if (currentSessionType === 'validation' || currentSessionType === 'practice') {
+                    questionsArray = currentValidationQuestions;
+                } else {
+                    const lesson = courseContent[currentUnitId].lessons[currentLessonId];
+                    questionsArray = lesson.questions;
+                }
+                
+                const question = questionsArray[currentQuestionIndex];
+                
+                let questionTextPrefix = currentSessionType === 'lesson' && lastAttemptWasIncorrect 
+                    ? `<span style="color: var(--red); font-weight: normal;">Réessaie. </span>` 
+                    : `${currentQuestionIndex + 1}/${questionsArray.length}. `;
+
+                let questionHTML = `<p id="question-text">${questionTextPrefix}${question.text}</p>`;
+
+                if (question.type === 'mcq') {
+                    let choices = question.choices;
+                    if (!lastAttemptWasIncorrect) {
+                        choices = shuffleArray([...question.choices]);
+                    }
+
+                    choices.forEach(choice => {
+                        questionHTML += 
+                            `<button class="choice-button" data-choice="${choice}">${choice}</button>`;
+                    });
+                } else if (question.type === 'input') {
+                    questionHTML += 
+                        `<input type="text" id="input-answer" class="input-answer" placeholder="Votre réponse..." autocapitalize="none" autocomplete="off" autocorrect="off">`;
+                }
+                
+                document.getElementById('question-area').innerHTML = questionHTML;
+
+                if (question.type === 'mcq') {
+                    document.querySelectorAll('.choice-button').forEach(button => {
+                        button.addEventListener('click', () => {
+                            document.querySelectorAll('.choice-button').forEach(btn => btn.classList.remove('selected'));
+                            button.classList.add('selected');
+                            selectedAnswer = button.dataset.choice;
+                            checkAnswerBtn.disabled = false;
+                        });
+                    });
+                } else if (question.type === 'input') {
+                    const inputField = document.getElementById('input-answer');
+                    inputField.addEventListener('input', (e) => {
+                        selectedAnswer = e.target.value;
+                        checkAnswerBtn.disabled = selectedAnswer.trim() === '';
+                    });
+                }
+            }
+
+            // --- 8. Fonctions de Logique de Jeu (Identique) ---
+
+            function startLesson(unitId, lessonId) {
+                currentUnitId = unitId;
+                currentLessonId = lessonId;
+                const lessonData = courseContent[unitId].lessons[lessonId];
+                const lessonStatus = userData.progress[lessonId];
+
+                if (lessonData.type === 'validation') {
+                    currentSessionType = 'validation';
+                } else if (lessonStatus === 'completed') {
+                    currentSessionType = 'practice';
+                } else {
+                    currentSessionType = 'lesson';
+                }
+
+                if (currentSessionType === 'lesson' && userData.lives <= 0) {
+                    showOutOfLivesMessage();
+                    return;
+                }
+                
+                currentQuestionIndex = 0; 
+                lastAttemptWasIncorrect = false; 
+                
+                lessonModalEl.style.display = 'flex';
+                lessonTitleEl.innerText = lessonData.title;
+
+                if (currentSessionType === 'lesson') {
+                    loadExplanation(); 
+                } else {
+                    if (currentSessionType === 'practice') {
+                         currentValidationQuestions = shuffleArray([...lessonData.questions]);
+                    }
+                    startQuiz(); 
+                }
+            }
+
+            function checkAnswer() {
+                let questionsArray;
+                if (currentSessionType === 'validation' || currentSessionType === 'practice') {
+                    questionsArray = currentValidationQuestions;
+                } else {
+                    const lesson = courseContent[currentUnitId].lessons[currentLessonId];
+                    questionsArray = lesson.questions;
+                }
+                
+                const question = questionsArray[currentQuestionIndex];
+                let isCorrect = false;
+
+                document.querySelectorAll('.choice-button, .input-answer').forEach(el => el.disabled = true);
+
+                if (question.type === 'mcq') {
+                    isCorrect = (selectedAnswer === question.answer);
+                    document.querySelectorAll('.choice-button').forEach(button => {
+                        if (button.dataset.choice === question.answer) {
+                            button.classList.add('correct');
+                        } else if (button.dataset.choice === selectedAnswer) {
+                            button.classList.add('incorrect');
+                        }
+                    });
+                } else if (question.type === 'input') {
+                    const normalizedUserAnswer = selectedAnswer.trim().toLowerCase();
+                    const normalizedCorrectAnswer = question.answer.toLowerCase();
+                    
+                    isCorrect = (normalizedUserAnswer === normalizedCorrectAnswer);
+                    
+                    // Gérer les réponses alternatives
+                    if (question.answer.includes("Résistance")) {
+                        isCorrect = (normalizedUserAnswer === "resistance" || normalizedUserAnswer === "résistance");
+                    }
+                    if (question.answer.includes("Support")) {
+                        isCorrect = (normalizedUserAnswer === "support");
+                    }
+                    
+                    const inputField = document.getElementById('input-answer');
+                    if (isCorrect) {
+                        inputField.classList.add('correct');
+                    } else {
+                        inputField.classList.add('incorrect');
+                    }
+                }
+                
+                lastAttemptWasIncorrect = !isCorrect;
+
+                if (currentSessionType === 'validation') {
+                    questionsArray[currentQuestionIndex].wasCorrect = isCorrect;
+                }
+
+                const feedbackMsg = document.createElement('div');
+                feedbackMsg.id = 'feedback-message';
+
+                if (isCorrect) {
+                    feedbackFooterEl.className = 'feedback-footer correct';
+                    feedbackMsg.className = 'correct';
+                    feedbackMsg.innerText = "Bonne réponse ! Continuez.";
+                    if (currentSessionType === 'lesson') {
+                        userData.streak++;
+                    }
+                } else {
+                    feedbackFooterEl.className = 'feedback-footer incorrect';
+                    feedbackMsg.className = 'incorrect';
+                    
+                    if (question.type === 'input' || currentSessionType === 'lesson') {
+                        feedbackMsg.innerText = `Dommage. La bonne réponse est : "${question.answer}"`;
+                    } else { 
+                        feedbackMsg.innerText = "Dommage. Ce n'est pas correct.";
+                    }
+                    
+                    if (currentSessionType === 'lesson') {
+                        userData.lives--;
+                        userData.streak = 0;
+                        updateStatsUI();
+                        saveUserData();
+                    }
+                }
+
+                const continueBtnClass = isCorrect ? 'correct-btn' : 'incorrect-btn';
+                const nextBtnText = (currentSessionType === 'lesson' && !isCorrect) ? "Réessayer la question" : "Continuer";
+
+                feedbackFooterEl.innerHTML = `<button id="next-btn" class="footer-btn ${continueBtnClass}">${nextBtnText}</button>`;
+                feedbackFooterEl.prepend(feedbackMsg);
+                document.getElementById('next-btn').addEventListener('click', nextStep);
+                
+                if (userData.lives <= 0 && currentSessionType === 'lesson') {
+                    document.getElementById('next-btn').innerText = "Terminer la leçon (Plus de vies)";
+                }
+            }
+
+            function nextStep() {
+                if (userData.lives <= 0 && currentSessionType === 'lesson') {
+                    closeLesson();
+                    showOutOfLivesMessage(); 
+                    return;
+                }
+                
+                if (currentSessionType === 'lesson' && lastAttemptWasIncorrect) {
+                    loadQuestion();
+                    return; 
+                }
+
+                currentQuestionIndex++;
+                
+                let questionsArray;
+                if (currentSessionType === 'validation' || currentSessionType === 'practice') {
+                    questionsArray = currentValidationQuestions;
+                } else {
+                    const lesson = courseContent[currentUnitId].lessons[currentLessonId];
+                    questionsArray = lesson.questions;
+                }
+
+                if (currentQuestionIndex < questionsArray.length) {
+                    loadQuestion(); 
+                } else {
+                    completeSession();
+                }
+            }
+            
+            function completeSession() {
+                let summaryMessage = "";
+                let isSuccess = true;
+                let rewardGems = 0;
+                let nextAction = "Continuer vers le parcours";
+                let btnClass = "correct-btn";
+
+
+                if (currentSessionType === 'practice') {
+                    userData.lives = Math.min(LIFE_MAX, userData.lives + 1); 
+                    summaryMessage = "✔️ Pratique terminée ! ❤️ +1 Vie Regagnée (Max: 5) !";
+                } else if (currentSessionType === 'validation') {
+                    const lessonData = courseContent[currentUnitId].lessons[currentLessonId];
+                    const correctCount = currentValidationQuestions.filter(q => q.wasCorrect).length;
+                    const passCount = Math.ceil(QUESTIONS_PER_VALIDATION * lessonData.passRate);
+                    isSuccess = correctCount >= passCount;
+
+                    if (isSuccess) {
+                        rewardGems = 50; // Plus de gemmes pour les leçons avancées
+                        userData.gems += rewardGems;
+                        userData.progress[currentLessonId] = 'completed';
+                        handleLessonUnlock(currentLessonId, 'validation');
+                        
+                        if (currentLessonId === 'validation-9') {
+                            summaryMessage = `🎓 FÉLICITATIONS ! Vous avez terminé l'analyse avancée ! 💎 +${rewardGems} Gemmes !`;
+                        } else {
+                            summaryMessage = `🏆 Validation réussie (${correctCount}/${QUESTIONS_PER_VALIDATION}) ! 💎 +${rewardGems} Gemmes ! L'unité suivante est débloquée.`;
+                        }
+                    } else {
+                        rewardGems = 10;
+                        userData.gems += rewardGems;
+                        btnClass = "incorrect-btn";
+                        summaryMessage = `❌ Échec de la Validation (${correctCount}/${QUESTIONS_PER_VALIDATION}). Il fallait ${passCount} bonnes réponses. 💎 +${rewardGems} Gemmes pour la tentative. Révisez et réessayez !`;
+                    }
+                } else { // Standard Lesson
+                    rewardGems = 20; // Plus de gemmes pour les leçons avancées
+                    userData.gems += rewardGems;
+                    userData.progress[currentLessonId] = 'completed';
+                    handleLessonUnlock(currentLessonId, 'standard');
+                    summaryMessage = `✅ Leçon terminée ! 💎 +${rewardGems} Gemmes gagnées !`;
+                }
+                
+                lessonBodyContainerEl.innerHTML = `
+                    <div style="padding: 25px;">
+                        <h2 style="text-align: center; color: ${isSuccess ? 'var(--green)' : 'var(--red)'}; margin-bottom: 20px;">${isSuccess ? 'Félicitations !' : 'À Réviser !'}</h2>
+                        <p id="feedback-final-message" style="text-align: center; font-size: 1.2rem; font-weight: bold; padding: 15px; border-radius: 8px; background-color: var(--grey-light);">${summaryMessage}</p>
+                    </div>
+                `;
+                feedbackFooterEl.className = 'feedback-footer ' + (isSuccess ? 'correct' : 'incorrect');
+                feedbackFooterEl.innerHTML = `<button id="close-modal-btn" class="footer-btn ${btnClass}">Continuer vers le parcours</button>`;
+                document.getElementById('close-modal-btn').addEventListener('click', closeLesson);
+                
+                updateStatsUI();
+                saveUserData();
+            }
+            
+            function handleLessonUnlock(completedLessonId, type) {
+                let allLessons = [];
+                for (const unitId in courseContent) {
+                    for (const lessonId in courseContent[unitId].lessons) {
+                        allLessons.push(lessonId);
+                    }
+                }
+
+                const currentLessonIndex = allLessons.indexOf(completedLessonId);
+                const nextLessonId = allLessons[currentLessonIndex + 1];
+
+                if (!nextLessonId) return; 
+
+                if (type === 'standard') {
+                    if (userData.progress[nextLessonId] === 'locked') {
+                        userData.progress[nextLessonId] = 'active';
+                    }
+                } else if (type === 'validation') {
+                    if (userData.progress[nextLessonId] === 'locked') {
+                        userData.progress[nextLessonId] = 'active';
+                    }
+                }
+            }
+
+
+            function closeLesson() {
+                lessonModalEl.style.display = 'none';
+                renderLearningPath(); 
+            }
+            
+            function buyLives() {
+                if (userData.gems >= LIFE_PACK_COST) {
+                    userData.gems -= LIFE_PACK_COST;
+                    userData.lives = LIFE_MAX; 
+                    
+                    updateStatsUI();
+                    saveUserData();
+                    
+                    lessonTitleEl.innerText = "Achat réussi !";
+                    lessonBodyContainerEl.innerHTML = `
+                        <div style="padding: 25px;">
+                            <p id="question-text" style="text-align: center; color: var(--green);">
+                                ❤️ ${LIFE_PACK_AMOUNT} vies achetées pour 💎 ${LIFE_PACK_COST} gemmes ! 
+                                <br><br>
+                                Tu es prêt à apprendre !
+                            </p>
+                        </div>
+                    `;
+                    feedbackFooterEl.className = 'feedback-footer correct';
+                    feedbackFooterEl.innerHTML = `<button id="close-modal-btn" class="footer-btn correct-btn">Continuer vers le parcours</button>`;
+                    document.getElementById('close-modal-btn').addEventListener('click', closeLesson);
+
+                } else {
+                    lessonTitleEl.innerText = "Achat impossible";
+                    lessonBodyContainerEl.innerHTML = `
+                        <div style="padding: 25px;">
+                            <p id="question-text" style="text-align: center; color: var(--red);">
+                                Il te manque des gemmes ! Tu as 💎 ${userData.gems} mais il te faut 💎 ${LIFE_PACK_COST} pour un plein de vies.
+                            </p>
+                        </div>
+                    `;
+                    feedbackFooterEl.className = 'feedback-footer incorrect';
+                    feedbackFooterEl.innerHTML = `<button id="close-modal-btn" class="footer-btn incorrect-btn">D'accord</button>`;
+                    document.getElementById('close-modal-btn').addEventListener('click', closeLesson);
+                }
+            }
+
+
+            function showOutOfLivesMessage() {
+                lessonTitleEl.innerText = "Alerte : Plus de vies !";
+                
+                const canAfford = userData.gems >= LIFE_PACK_COST;
+                const buyBtnClass = canAfford ? 'correct-btn' : 'incorrect-btn';
+                const buyBtnText = `Acheter ${LIFE_PACK_AMOUNT} Vies pour 💎 ${LIFE_PACK_COST}`;
+                
+                lessonBodyContainerEl.innerHTML = `
+                    <div style="padding: 25px;">
+                        <p id="question-text" style="text-align: center;">
+                            Tu n'as plus de vies (❤️) pour commencer de nouvelles leçons.
+                            <br><br>
+                            Pratique les leçons déjà terminées (icône ✔️) ou fais les tests de Validation réussis (icône 🏆) pour regagner des vies, ou achète un pack !
+                        </p>
+                    </div>
+                `;
+                
+                feedbackFooterEl.className = 'feedback-footer'; 
+                feedbackFooterEl.innerHTML = `
+                    <button id="buy-lives-btn" class="footer-btn ${buyBtnClass}" style="margin-bottom: 10px;" ${canAfford ? '' : 'disabled'}>
+                        ${buyBtnText}
+                    </button>
+                    <button id="close-modal-btn" class="footer-btn" style="background-color: #888; border-color: #555;">D'accord</button>
+                `;
+                
+                document.getElementById('buy-lives-btn').addEventListener('click', buyLives);
+                document.getElementById('close-modal-btn').addEventListener('click', closeLesson);
+
+                lessonModalEl.style.display = 'flex';
+            }
+            
+            // --- Logique d'administration (Modifiée pour cette page) ---
+
+            function isAdminUnlocked() {
+                // Vérifie si la première leçon avancée est débloquée
+                return userData.progress[FIRST_ADVANCED_LESSON_ID] === 'active' || userData.progress[FIRST_ADVANCED_LESSON_ID] === 'completed';
+            }
+
+            function updateAdminButtonUI() {
+                const isCurrentlyUnlocked = isAdminUnlocked();
+                    adminUnlockBtn.style.display = 'flex';
+                    adminUnlockBtn.style.alignItems = 'center';
+                    adminUnlockBtn.style.justifyContent = 'center';
+                    adminUnlockBtn.style.padding = '0';
+                if (isCurrentlyUnlocked) {
+                    adminUnlockBtn.innerText = '🔒';
+                    adminUnlockBtn.title = 'Reverrouiller les leçons avancées (Mode Dev)';
+                } else {
+                    adminUnlockBtn.innerText = '🔓';
+                    adminUnlockBtn.title = 'Débloquer les leçons avancées (Mode Dev)';
+                }
+            }
+
+
+            function toggleAdminLock() {
+                let changed = false;
+                const isCurrentlyUnlocked = isAdminUnlocked();
+                const action = isCurrentlyUnlocked ? "REVERROUILLAGE" : "DÉBLOQUAGE";
+
+                if (isCurrentlyUnlocked) {
+                    // --- Relock action (sur les leçons de cette page) ---
+                    for (const lessonId in userData.progress) {
+                        if (lessonId.startsWith('analyse-adv-') || lessonId.startsWith('validation-8') || lessonId.startsWith('validation-9')) {
+                             if (lessonId !== FIRST_ADVANCED_LESSON_ID) {
+                                userData.progress[lessonId] = 'locked';
+                             } else {
+                                // Garder la première leçon débloquée si la page 1 est terminée
+                                const mainPageComplete = userData.progress[UNLOCK_REQUIREMENT_ID] === 'completed';
+                                userData.progress[lessonId] = mainPageComplete ? 'active' : 'locked';
+                             }
+                        }
+                    }
+                } else {
+                    // --- Unlock action (sur les leçons de cette page) ---
+                    for (const unitId in courseContent) {
+                        for (const lessonId in courseContent[unitId].lessons) {
+                             if (userData.progress[lessonId] === 'locked') {
+                                userData.progress[lessonId] = 'active';
+                                changed = true;
+                            }
+                        }
+                    }
+                }
+
+                saveUserData();
+                renderLearningPath();
+                updateAdminButtonUI();
+                console.log(`Admin Action: ${action} réussi.`);
+            }
+
+
+            // --- 9. NOUVELLE Initialisation de l'application ---
+            
+            /**
+             * Vérifie si l'accès à cette page (avancée) doit être débloqué.
+             */
+            function checkAdvancedUnlock() {
+                // Vérifie si l'utilisateur a terminé la validation finale de la page 1
+                const mainPageComplete = userData.progress[UNLOCK_REQUIREMENT_ID] === 'completed';
+
+                if (mainPageComplete && userData.progress[FIRST_ADVANCED_LESSON_ID] === 'locked') {
+                    // Si oui, et que la première leçon de la page 2 est verrouillée, on la débloque.
+                    userData.progress[FIRST_ADVANCED_LESSON_ID] = 'active';
+                    saveUserData(); // Sauvegarder ce déblocage
+                }
+                
+                // Si la page 1 n'est PAS terminée, afficher un message de blocage
+                if (!mainPageComplete) {
+                    learningPathEl.innerHTML = `
+                        <div style="padding: 20px; text-align: center; background-color: var(--bg-secondary); border-radius: 15px; margin: 20px; max-width: 400px; border: 2px solid var(--border-color); box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+                            <h2 style="color: var(--red);">Accès Verrouillé</h2>
+                            <p style="font-size: 1.1rem; color: var(--text-secondary); line-height: 1.5;">
+                                Vous devez d'abord terminer toutes les leçons de l'Unité 7 (Concepts Experts) sur la page principale pour débloquer ce contenu avancé.
+                            </p>
+                            <span style="font-size: 3rem; margin-top: 15px; display: block;">👑</span>
+                        </div>
+                    `;
+                    return false; // Empêcher renderLearningPath
+                }
+                return true; // Autoriser renderLearningPath
+            }
+
+            initializeDarkMode();
+            updateStatsUI();
+            updateAdminButtonUI(); 
+            
+            // Exécuter le check de déblocage
+            if (checkAdvancedUnlock()) {
+                renderLearningPath(); // Ne rendre le parcours que s'il est débloqué
+            }
+            
+            closeLessonBtn.addEventListener('click', closeLesson);
+            darkModeToggle.addEventListener('click', toggleDarkMode);
+            adminUnlockBtn.addEventListener('click', toggleAdminLock); 
+
+        });
+    </script>
+</body>
+</html>
