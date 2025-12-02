@@ -481,18 +481,11 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
             z-index: 100;
         }
-        .menu-control{
-            display: block;
-            position: absolute;
-            left: 48.5%;
-            top: 50%;
-            transform: translate(-50%, -50%);
-            margin: 0;
-            width: auto;
-        }
-        #home-btn {
-            background-color: var(--border-color);
+/* ... (styles .footer, .menu-control, #home-btn existants) ... */
         
+        /* AJOUTEZ CECI */
+        #home-btn, #extrade-btn {
+            background-color: var(--border-color);
             height: 40px;
             width: 40px;
             border-radius: 10px;
@@ -500,13 +493,22 @@
             background: var(--bg-primary);
             color: var(--text-color);
             border: 2px solid var(--border-color);
-            padding: 5px 8px; /* Réduit le padding */
+            padding: 5px 8px;
             cursor: pointer;
-            font-size: 100%; /* Réduit la taille de police */
+            font-size: 100%;
             transition: background-color 0.2s, border-color 0.2s;
             white-space: nowrap; 
         }
-
+        /* Style pour le bouton ACTIF */
+        #home-btn.active-page {
+            background-color: var(--blue);
+            color: white;
+            border-color: #0056b3;
+        }
+        .footer-btn-group {
+            display: flex;
+            gap: 10px;
+        }
         /* ---------------------------------------------------- */
         /* MEDIA QUERIES pour les grands écrans (tablette et desktop) */
         /* ---------------------------------------------------- */
@@ -680,12 +682,14 @@
                 </footer>
         </div>
     </div>
-    <footer class="footer">
-        <div class="menu-control">
-            <a href="index.html"><button id="home-btn">🏠</button></a>
-            <a href="extrade.html"><button id="home-btn">💸</button></a>
+   <footer class="footer">
+        <div class="menu-control footer-btn-group">
+            <a href="index.html"><button id="home-btn" class="active-page">🏠</button></a>
+            <a href="extrade.html"><button id="extrade-btn">📈</button></a>
+            <a href="page2.html"><button id="extrade-btn">💸</button></a>
         </div>
     </footer>
+    
     <script>
         document.addEventListener('DOMContentLoaded', () => {
 
