@@ -6,38 +6,70 @@
     <title>Mon Site Trading - Chargement...</title> 
     
     <style>
-        /* Styles omis pour la concision, mais ils sont les mêmes que précédemment (Style TradeLingo) */
+        /* Définition des variables CSS pour une gestion facile des thèmes */
+        :root {
+            /* Variables par défaut (Mode Clair) */
+            --bg-primary: #F8F8F8;
+            --bg-secondary: #FFFFFF;
+            --border-color: #E0E0E0;
+            --text-color: #333333;
+            --text-secondary: #888;
+            --accent-color: #6C5CE7; /* Violet Clair */
+            --chart-bg: #FFFFFF;
+        }
+
+        /* Surcharge des variables pour le Mode Sombre */
+        html[data-theme='dark'] {
+            --bg-primary: #121212;
+            --bg-secondary: #1E1E1E;
+            --border-color: #333333;
+            --text-color: #E0E0E0;
+            --text-secondary: #AAAAAA;
+            --accent-color: #B300FF; /* Violet Profond */
+            --chart-bg: #1E1E1E;
+        }
+
+        /* Styles de base */
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
             margin: 0;
-            padding: 20px;
+            padding: 70px 20px 20px 20px; /* Ajout d'un padding en haut pour la barre de navigation fixe */
             text-align: center;
             transition: background-color 0.3s, color 0.3s;
+            background-color: var(--bg-primary);
+            color: var(--text-color);
         }
 
         h1 {
             font-size: 2.5em;
             margin-bottom: 20px;
             transition: color 0.3s;
+            color: var(--text-color);
         }
 
         p {
             font-size: 0.9em;
-            color: #888;
+            color: var(--text-secondary);
         }
         
+        /* Conteneur du graphique */
         .tradingview-widget-container {
             max-width: 1200px;
             margin: 20px auto;
             border-radius: 8px;
             padding: 0; 
             transition: background-color 0.3s;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            overflow: hidden; /* Pour contenir le widget TradingView */
+            background-color: var(--chart-bg);
         }
         
         .controls {
             margin-bottom: 30px;
         }
-        .footer {
+        
+        /* Barre de navigation fixe (Remplaçant l'ancien .footer) */
+        .nav-header { 
             position: fixed;
             top: 0;
             left: 0;
@@ -47,31 +79,38 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 15px; /* Réduit le padding sur mobile */
+            padding: 10px 15px; 
             height: 50px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            z-index: 100;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+            z-index: 1000;
         }
+
         .menu-control{
             display: flex;
-            gap: 5px; /* Réduit l'espace entre les boutons */
+            gap: 10px; 
             align-items: center;
         }
+        
+        /* Boutons de navigation (🏠 et 💸) */
         #home-btn {
-            width: 35px;
-            height: 35px;
-            
+            width: 38px;
+            height: 38px;
+            line-height: 38px; /* Pour centrer l'icône */
             background: var(--bg-primary);
             color: var(--text-color);
             border: 2px solid var(--border-color);
-            padding: 5px 8px; /* Réduit le padding */
-            border-radius: 50%; /* Légèrement plus petit */
+            padding: 0; 
+            border-radius: 50%;
             cursor: pointer;
-            font-size: 200%; /* Réduit la taille de police */
-            transition: background-color 0.2s, border-color 0.2s;
-            white-space: nowrap; 
+            font-size: 1.2em;
+            transition: background-color 0.2s, border-color 0.2s, transform 0.1s;
         }
-
+        #home-btn:hover {
+            border-color: var(--accent-color);
+            transform: scale(1.05);
+        }
+        
+        /* Bouton de bascule du thème */
         #theme-toggle {
             padding: 10px 25px;
             border: none;
@@ -81,43 +120,21 @@
             font-size: 1em;
             letter-spacing: 0.5px;
             transition: opacity 0.2s;
+            background-color: var(--accent-color);
+            color: white;
         }
         #theme-toggle:hover {
-            opacity: 0.8;
-        }
-        
-        html[data-theme='dark'] body {
-            background-color: #121212;
-            color: #E0E0E0;
-        }
-        html[data-theme='dark'] h1 {
-            color: #FFFFFF;
-        }
-        html[data-theme='dark'] .tradingview-widget-container {
-            background-color: #1E1E1E;
-        }
-        html[data-theme='dark'] #theme-toggle {
-            background-color: #B300FF; 
-            color: white;
-        }
-
-        html[data-theme='light'] body {
-            background-color: #F8F8F8;
-            color: #333;
-        }
-        html[data-theme='light'] h1 {
-            color: #1A1A1A;
-        }
-        html[data-theme='light'] .tradingview-widget-container {
-            background-color: #FFFFFF;
-        }
-        html[data-theme='light'] #theme-toggle {
-            background-color: #6C5CE7;
-            color: white;
+            opacity: 0.9;
         }
     </style>
 </head>
 <body>
+
+    <header class="nav-header"> <div class="menu-control">
+            <a href="index.html"><button id="home-btn" title="Accueil">🏠</button></a>
+            <a href="extrade.html"><button id="home-btn" title="Graphique">💸</button></a>
+        </div>
+    </header>
 
     <h1 id="main-title">📈 Graphique Avancé...</h1> 
 
@@ -132,7 +149,9 @@
       <script type="text/javascript">
       
       let tvWidget = null;
-      let currentTheme = 'dark';
+      // Récupérer le thème initial à partir de l'attribut HTML
+      let currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+
       // Définir le symbole par défaut (celui qui est sur la capture d'écran)
       const defaultSymbol = "BINANCE:BTCUSDT"; 
 
@@ -155,6 +174,9 @@
           // On s'assure que le conteneur est vide avant de le recréer (nécessaire pour le changement de thème)
           container.innerHTML = ''; 
           
+          // La couleur de la barre d'outils doit correspondre au fond de la barre de navigation (.nav-header)
+          const toolbarBg = (theme === 'dark' ? "#1E1E1E" : "#FFFFFF"); 
+          
           tvWidget = new TradingView.widget(
           {
             "width": "100%",
@@ -165,7 +187,7 @@
             "theme": theme, 
             "style": "1",
             "locale": "fr",
-            "toolbar_bg": (theme === 'dark' ? "#1E1E1E" : "#F8F8F8"),
+            "toolbar_bg": toolbarBg,
             "enable_publishing": false,
             "allow_symbol_change": true,
             "container_id": "tradingview_chart_widget"
@@ -230,20 +252,19 @@
 
       // Initialisation au chargement de la page
       document.addEventListener('DOMContentLoaded', () => {
+          // Définir le texte initial du bouton en fonction du thème initial
+          if (currentTheme === 'dark') {
+             document.getElementById('theme-toggle').innerHTML = "Passer en Mode Clair ☀️";
+          } else {
+             document.getElementById('theme-toggle').innerHTML = "Passer en Mode Sombre 🌙";
+          }
           // Initialise le widget avec le symbole BTCUSDT par défaut
           initWidget(currentTheme); 
-          document.getElementById('theme-toggle').innerHTML = "Passer en Mode Clair ☀️";
       });
 
       </script>
     </div>
 
     <p style="margin-top: 40px;">Ce graphique est fourni gratuitement par TradingView.</p>
-    <footer class="footer">
-        <div class="menu-control">
-            <a href="index.html"><button id="home-btn">🏠</button></a>
-            <a href="extrade.html"><button id="home-btn">💸</button></a>
-        </div>
-    </footer>
 </body>
 </html>
