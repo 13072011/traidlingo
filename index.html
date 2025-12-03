@@ -509,6 +509,28 @@
             display: flex;
             gap: 10px;
         }
+        #page2-cta-container {
+            width: 95%;
+            max-width: 400px; /* Aligné sur la largeur max des unités */
+            margin: 30px auto 100px auto; /* Marge pour être visible au-dessus du footer fixe */
+            text-align: center;
+        }
+        .page2-link {
+            text-decoration: none; /* Enlève le soulignement du lien */
+        }
+        /* Style spécifique pour le bouton */
+        #next-page-btn {
+            background-color: var(--purple);
+            border-color: var(--purple-dark);
+            color: var(--bg-secondary);
+            font-size: 1.1rem;
+            padding: 15px; /* Rendre le bouton plus grand */
+            border-bottom-width: 4px; 
+        }
+        #next-page-btn:hover {
+            background-color: var(--purple-dark);
+            filter: none;
+        }
         /* ---------------------------------------------------- */
         /* MEDIA QUERIES pour les grands écrans (tablette et desktop) */
         /* ---------------------------------------------------- */
@@ -637,6 +659,9 @@
             #feedback-message {
                 font-size: 1.2rem;
             }
+            #page2-cta-container {
+            max-width: 500px;
+        }
         
     </style>
 </head>
@@ -668,7 +693,15 @@
     </header>
 
     <main class="learning-path" id="learning-path">
-        </main>
+    </main>
+    <div id="page2-cta-container">
+        <a href="page2.html" class="page2-link">
+            <button id="next-page-btn" class="footer-btn">
+                Passer aux Unités Avancées 💸
+            </button>
+        </a>
+    </div>
+
 
     <div class="lesson-modal" id="lesson-modal">
         <div class="lesson-content">
@@ -686,7 +719,6 @@
         <div class="menu-control footer-btn-group">
             <a href="index.html"><button id="home-btn" class="active-page">🏠</button></a>
             <a href="extrade.html"><button id="extrade-btn">📈</button></a>
-            <a href="page2.html"><button id="extrade-btn">💸</button></a>
         </div>
     </footer>
     
