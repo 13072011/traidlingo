@@ -1540,7 +1540,10 @@
                         isCorrect = (normalizedUserAnswer === "appel de marge" || normalizedUserAnswer === "margin call");
                     }
                     if (question.answer.includes("Acheter")) {
-                        isCorrect = (normalizedUserAnswer === "acheter" || normalizedUserAnswer === "achat");
+                        isCorrect = (normalizedUserAnswer === "acheter" || normalizedUserAnswer === "achat"|| normalizedUserAnswer === "acheté");
+                    }
+                    if (question.answer.includes("Dividende")) {
+                        isCorrect = (normalizedUserAnswer === "dividende" || normalizedUserAnswer === "une dividende");
                     }
                     
                     const inputField = document.getElementById('input-answer');
@@ -1549,6 +1552,7 @@
                     } else {
                         inputField.classList.add('incorrect');
                     }
+
                 }
                 
                 // Sauvegarder l'état de la tentative
