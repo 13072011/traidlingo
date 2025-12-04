@@ -1216,10 +1216,10 @@
                     
                     // Gérer les réponses alternatives
                     if (question.answer.includes("Résistance")) {
-                        isCorrect = (normalizedUserAnswer === "resistance" || normalizedUserAnswer === "résistance");
+                        isCorrect = (normalizedUserAnswer === "resistance" || normalizedUserAnswer === "résistance"|| normalizedUserAnswer === "une résistance"|| normalizedUserAnswer === "une resistance");
                     }
                     if (question.answer.includes("Support")) {
-                        isCorrect = (normalizedUserAnswer === "support");
+                        isCorrect = (normalizedUserAnswer === "support"||normalizedUserAnswer === "un support");
                     }
                     
                     const inputField = document.getElementById('input-answer');
@@ -1568,4 +1568,5 @@
     </script>
 </body>
 </html>
+
 
