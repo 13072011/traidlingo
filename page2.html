@@ -161,6 +161,21 @@
             color: white;
             text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
         }
+        .unit-container:nth-child(3) .unit-title { 
+            background: linear-gradient(45deg, #00bfff, #0077b6); /* Ocean Blue */
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+        .unit-container:nth-child(4) .unit-title { 
+            background: linear-gradient(45deg, #ff8c00, #ff4500); /* Deep Orange */
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+        .unit-container:nth-child(5) .unit-title { 
+            background: linear-gradient(45deg, #4b0082, #8a2be2); /* Indigo/Violet */
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
 
 
         .lesson-node {
@@ -731,7 +746,7 @@
             const UNLOCK_REQUIREMENT_ID = 'validation-7';
 
 
-            // --- 1. NOUVELLE Base de Données des Cours (Unités 8 & 9) ---
+            // --- 1. Base de Données des Cours (Unités 8, 9, 10, 11, 12, 13) ---
             const courseContent = {
                 'unit-8': {
                     title: "Unité 8 : Support & Résistance",
@@ -769,7 +784,7 @@
                                 <p>Tant que le prix reste au-dessus de la ligne de tendance haussière, la tendance est considérée comme intacte.</p>
                                                                 
                                 <h4>Vidéo d'exemple</h4>
-                                <p>Regardez cette vidéo pour voir comment tracer des lignes de tendance.</p>
+                                <p>Regardez cette vidéo pour voir comment tracer des lignes de tendance (exemple fictif).</p>
                                 <div class="video-container">
                                     <iframe src="https://www.youtube.com/embed/dWc-NJCx0-8" title="Exemple de Lignes de Tendance" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                                 </div>
@@ -838,13 +853,178 @@
                             questions: []
                         }
                     }
+                },
+                // --- NOUVELLES UNITÉS AJOUTÉES ICI ---
+                'unit-10': {
+                    title: "Unité 10 : Indicateurs Avancés II",
+                    lessons: {
+                        'analyse-adv-5': {
+                            icon: '☁️',
+                            title: "Ichimoku Kinkō Hyō",
+                            type: 'standard',
+                            content: `
+                                <h3>Ichimoku Kinkō Hyō</h3>
+                                <p>L'<strong>Ichimoku Kinkō Hyō</strong> (qui signifie 'graphique d'équilibre en un coup d'œil') est un indicateur de tendance complet japonais qui sert à identifier la direction de la tendance, les niveaux de support/résistance et la dynamique future.</p>
+                                <ul>
+                                    <li>Le <strong>Kumo (nuage)</strong> est la partie la plus visible et agit comme un support/résistance dynamique.</li>
+                                    <li>La position du prix par rapport au nuage indique la tendance.</li>
+                                </ul>
+                            `,
+                            questions: [
+                                { type: 'mcq', text: "Comment appelle-t-on la partie nuage de l'indicateur Ichimoku ?", choices: ["Kumo", "Tenkan", "Kijun", "Chikou"], answer: "Kumo" },
+                                { type: 'input', text: "L'Ichimoku est un indicateur de...", answer: "Tendance" }
+                            ]
+                        },
+                        'analyse-adv-6': {
+                            icon: '📊',
+                            title: "Volume Profile",
+                            type: 'standard',
+                            content: `
+                                <h3>Volume Profile (Profil de Volume)</h3>
+                                <p>Contrairement aux indicateurs de volume classiques, le **Volume Profile** affiche l'activité de trading (volume) à des niveaux de prix spécifiques sur une période donnée.</p>
+                                <ul>
+                                    <li>Le <strong>Point de Contrôle (POC)</strong> est le niveau de prix où le plus grand volume a été échangé, signalant un prix d'équilibre important.</li>
+                                </ul>
+                                <p>Les zones de haut volume sont des supports/résistances potentielles ; les zones de faible volume sont des zones de passage rapide.</p>
+                            `,
+                            questions: [
+                                { type: 'mcq', text: "Quel terme désigne le niveau de prix où le volume le plus important a été échangé ?", choices: ["Volume Maximum", "Point de Contrôle", "Volume Moyen", "Delta"], answer: "Point de Contrôle" },
+                                { type: 'input', text: "Le Profil de Volume est utilisé pour identifier les zones importantes de support et de...", answer: "Résistance" }
+                            ]
+                        },
+                        'validation-10': {
+                            icon: '🌟',
+                            title: "Validation : Indicateurs Avancés II",
+                            type: 'validation',
+                            unitToValidate: 'unit-10',
+                            passRate: 0.8,
+                            questions: []
+                        }
+                    }
+                },
+                'unit-11': {
+                    title: "Unité 11 : Stratégies Spécifiques",
+                    lessons: {
+                        'strat-adv-1': {
+                            icon: '⚡',
+                            title: "Scalping",
+                            type: 'standard',
+                            content: `
+                                <h3>Scalping : Le Trading Ultra-Court Terme</h3>
+                                <p>Le **Scalping** est une stratégie où le trader tente de réaliser de petits profits sur de très courtes périodes (quelques secondes à quelques minutes) en tirant parti de petites variations de prix.</p>
+                                <ul>
+                                    <li>Nécessite une exécution rapide et une grande discipline.</li>
+                                    <li>L'objectif est d'accumuler de nombreux petits gains.</li>
+                                </ul>
+                                <p>Le risque par trade est faible, mais la fréquence est très élevée.</p>
+                            `,
+                            questions: [
+                                { type: 'mcq', text: "Quel est l'horizon temporel typique du scalping ?", choices: ["Journées entières", "Semaines", "Quelques secondes à quelques minutes", "Mois"], answer: "Quelques secondes à quelques minutes" },
+                                { type: 'input', text: "Le scalping nécessite un très bon contrôle de la...", answer: "Discipline" }
+                            ]
+                        },
+                        'strat-adv-2': {
+                            icon: '👯',
+                            title: "Trading de Paires (Pair Trading)",
+                            type: 'standard',
+                            content: `
+                                <h3>Trading de Paires</h3>
+                                <p>Le **Pair Trading** (ou Trading de Paires) est une stratégie d'arbitrage statistique qui consiste à acheter un actif (Long) et à vendre un autre actif corrélé (Short) lorsque l'écart entre leurs prix s'écarte de leur moyenne historique.</p>
+                                <p>L'objectif est de parier sur la convergence future de l'écart. C'est une stratégie « market neutral » car elle minimise le risque lié à la direction globale du marché.</p>
+                            `,
+                            questions: [
+                                { type: 'mcq', text: "Le Trading de Paires est une stratégie qui parie sur la...", choices: ["Divergence", "Volatilité", "Tendance", "Convergence"], answer: "Convergence" },
+                                { type: 'input', text: "Dans le Pair Trading, vous achetez un actif et vous en... un autre corrélé.", answer: "Vendez" }
+                            ]
+                        },
+                        'validation-11': {
+                            icon: '🌟',
+                            title: "Validation : Stratégies Spécifiques",
+                            type: 'validation',
+                            unitToValidate: 'unit-11',
+                            passRate: 0.8,
+                            questions: []
+                        }
+                    }
+                },
+                'unit-12': {
+                    title: "Unité 12 : Flux d'Ordres et Marchés",
+                    lessons: {
+                        'marche-adv-1': {
+                            icon: '📑',
+                            title: "Carnet d'Ordres & Flux",
+                            type: 'standard',
+                            content: `
+                                <h3>Carnet d'Ordres (Order Book) et Flux d'Ordres</h3>
+                                <p>Le **Carnet d'Ordres** est une liste électronique des ordres d'achat et de vente en attente pour un instrument donné. L'analyse du **Flux d'Ordres** consiste à interpréter l'exécution en temps réel de ces ordres (à quel prix et avec quel volume) pour comprendre la pression acheteuse ou vendeuse immédiate.</p>
+                                <p>Cette analyse est cruciale pour le trading à haute fréquence et le scalping.</p>
+                            `,
+                            questions: [
+                                { type: 'mcq', text: "Que représente le Carnet d'Ordres ?", choices: ["L'historique des prix", "Les ordres d'achat et de vente en attente", "Les bénéfices des entreprises", "Les prévisions d'analystes"], answer: "Les ordres d'achat et de vente en attente" },
+                                { type: 'input', text: "Le Flux d'Ordres aide à comprendre la pression... ou vendeuse immédiate.", answer: "Acheteuse" }
+                            ]
+                        },
+                        'marche-adv-2': {
+                            icon: '🌍',
+                            title: "Analyse Intermarché",
+                            type: 'standard',
+                            content: `
+                                <h3>Analyse Intermarché</h3>
+                                <p>L'<strong>Analyse Intermarché</strong> étudie les corrélations entre différentes classes d'actifs (actions, obligations, devises, matières premières) pour obtenir une vue macroéconomique.</p>
+                                <ul>
+                                    <li>Exemple : La faiblesse du Dollar Index (**DXY**) est souvent corrélée à une hausse des matières premières (Or, Pétrole).</li>
+                                </ul>
+                                <p>Comprendre ces relations permet de confirmer ou d'infirmer une tendance sur un marché donné.</p>
+                            `,
+                            questions: [
+                                { type: 'mcq', text: "Quelle est l'une des classes d'actifs étudiées dans l'Analyse Intermarché ?", choices: ["La météo", "Les cryptomonnaies", "Les obligations", "Les jeux vidéo"], answer: "Les obligations" },
+                                { type: 'input', text: "Le DXY est un indice qui mesure la force du...", answer: "Dollar" }
+                            ]
+                        },
+                        'validation-12': {
+                            icon: '🌟',
+                            title: "Validation : Flux d'Ordres et Marchés",
+                            type: 'validation',
+                            unitToValidate: 'unit-12',
+                            passRate: 0.8,
+                            questions: []
+                        }
+                    }
+                },
+                'unit-13': {
+                    title: "Unité 13 : Automatisation (Pine Script)",
+                    lessons: {
+                        'prog-adv-1': {
+                            icon: '💻',
+                            title: "Introduction au Pine Script",
+                            type: 'standard',
+                            content: `
+                                <h3>Introduction au Pine Script</h3>
+                                <p>Le **Pine Script** est le langage de programmation utilisé par la plateforme TradingView pour écrire des indicateurs personnalisés et des stratégies de trading automatisées (robots de trading, ou EAs).</p>
+                                <ul>
+                                    <li>Il est conçu pour être relativement simple et est basé sur des structures de séries temporelles.</li>
+                                    <li>Permet de backtester des stratégies rapidement sur des données historiques.</li>
+                                </ul>
+                            `,
+                            questions: [
+                                { type: 'mcq', text: "Le Pine Script est un langage de programmation utilisé principalement sur quelle plateforme de graphiques ?", choices: ["MetaTrader 4", "Bloomberg Terminal", "TradingView", "Excel"], answer: "TradingView" },
+                                { type: 'input', text: "L'utilisation de données historiques pour tester une stratégie est appelée...", answer: "Backtesting" }
+                            ]
+                        },
+                        'validation-13': {
+                            icon: '🚀',
+                            title: "Validation Finale Avancée",
+                            type: 'validation',
+                            unitToValidate: 'unit-13',
+                            passRate: 0.8,
+                            questions: []
+                        }
+                    }
                 }
             };
 
 
-            // --- 2. Données de l'Utilisateur (MODIFIÉ) ---
-            // Le defaultUserData doit maintenant inclure la progression des DEUX pages
-            // pour que la fonction de fusion (loadUserData) fonctionne correctement.
+            // --- 2. Données de l'Utilisateur (MODIFIÉ avec les nouvelles leçons) ---
             const defaultUserData = {
                 streak: 0,
                 gems: 100,
@@ -876,14 +1056,30 @@
                     'expert-2': 'locked',
                     'validation-7': 'locked', // Leçon requise
                     
-                    // --- NOUVEAU PROGRÈS PAGE 2 ---
+                    // --- PROGRÈS PAGE 2 (Analyse Avancée) ---
                     'analyse-adv-1': 'locked', // U8 L1
                     'analyse-adv-2': 'locked',
                     'validation-8': 'locked', // U8 Val
                     
                     'analyse-adv-3': 'locked', // U9 L1
                     'analyse-adv-4': 'locked',
-                    'validation-9': 'locked'  // U9 Val (Fin Page 2)
+                    'validation-9': 'locked',  // U9 Val
+                    
+                    // --- NOUVELLES LEÇONS AJOUTÉES ---
+                    'analyse-adv-5': 'locked', // U10 L1
+                    'analyse-adv-6': 'locked',
+                    'validation-10': 'locked', // U10 Val
+                    
+                    'strat-adv-1': 'locked', // U11 L1
+                    'strat-adv-2': 'locked',
+                    'validation-11': 'locked', // U11 Val
+                    
+                    'marche-adv-1': 'locked', // U12 L1
+                    'marche-adv-2': 'locked',
+                    'validation-12': 'locked', // U12 Val
+                    
+                    'prog-adv-1': 'locked', // U13 L1
+                    'validation-13': 'locked' // U13 Val (Fin Page 2)
                 }
             };
             
@@ -978,8 +1174,7 @@
             function renderLearningPath() {
                 learningPathEl.innerHTML = ''; 
                 
-                // Cette fonction va maintenant générer les Unités 8 et 9
-                // car c'est ce qui est dans la variable 'courseContent' de CETTE page.
+                // Cette fonction va maintenant générer les Unités 8 à 13
                 for (const [unitId, unitData] of Object.entries(courseContent)) {
                     const unitDiv = document.createElement('div');
                     unitDiv.className = 'unit-container';
@@ -1006,10 +1201,10 @@
                             icon = '✔️';
                         } else if (lessonStatus === 'completed' && lessonData.type === 'validation') {
                             // Icône de fin de parcours
-                            if (lessonId === 'validation-9') {
-                                icon = '🎓'; 
+                            if (lessonId === 'validation-13') {
+                                icon = '🏆'; 
                             } else {
-                                icon = '🏆';
+                                icon = '✔️';
                             }
                         }
                         
@@ -1069,7 +1264,7 @@
                     lessonBodyContainerEl.innerHTML = `
                         <div class="course-explanation">
                             <h3>Test de Maîtrise</h3>
-                            <p>Ce test évalue votre maîtrise de l'Unité ${lessonData.unitToValidate.slice(-1)}. Vous devez obtenir ${lessonData.passRate * 100}% de bonnes réponses.</p>
+                            <p>Ce test évalue votre maîtrise de l'Unité ${lessonData.unitToValidate.slice(-2)}. Vous devez obtenir ${lessonData.passRate * 100}% de bonnes réponses.</p>
                             <p>Bonne chance !</p>
                             <button class="explanation-next-btn" id="start-quiz-btn">Démarrer le Test de ${QUESTIONS_PER_VALIDATION} Questions</button>
                         </div>
@@ -1216,10 +1411,28 @@
                     
                     // Gérer les réponses alternatives
                     if (question.answer.includes("Résistance")) {
-                        isCorrect = (normalizedUserAnswer === "resistance" || normalizedUserAnswer === "résistance"|| normalizedUserAnswer === "une résistance"|| normalizedUserAnswer === "une resistance");
+                        isCorrect = (normalizedUserAnswer === "resistance" || normalizedUserAnswer === "résistance");
                     }
                     if (question.answer.includes("Support")) {
-                        isCorrect = (normalizedUserAnswer === "support"||normalizedUserAnswer === "un support");
+                        isCorrect = (normalizedUserAnswer === "support");
+                    }
+                    if (question.answer.includes("Tendance")) {
+                        isCorrect = (normalizedUserAnswer === "tendance");
+                    }
+                    if (question.answer.includes("Acheteuse")) {
+                        isCorrect = (normalizedUserAnswer === "acheteuse");
+                    }
+                    if (question.answer.includes("Convergence")) {
+                        isCorrect = (normalizedUserAnswer === "convergence");
+                    }
+                    if (question.answer.includes("Discipline")) {
+                        isCorrect = (normalizedUserAnswer === "discipline");
+                    }
+                    if (question.answer.includes("Dollar")) {
+                        isCorrect = (normalizedUserAnswer === "dollar");
+                    }
+                    if (question.answer.includes("Backtesting")) {
+                        isCorrect = (normalizedUserAnswer === "backtesting");
                     }
                     
                     const inputField = document.getElementById('input-answer');
@@ -1328,8 +1541,8 @@
                         userData.progress[currentLessonId] = 'completed';
                         handleLessonUnlock(currentLessonId, 'validation');
                         
-                        if (currentLessonId === 'validation-9') {
-                            summaryMessage = `🎓 FÉLICITATIONS ! Vous avez terminé l'analyse avancée ! 💎 +${rewardGems} Gemmes !`;
+                        if (currentLessonId === 'validation-13') {
+                            summaryMessage = `🏆 FÉLICITATIONS ! Vous avez terminé toutes les unités avancées ! 💎 +${rewardGems} Gemmes !`;
                         } else {
                             summaryMessage = `🏆 Validation réussie (${correctCount}/${QUESTIONS_PER_VALIDATION}) ! 💎 +${rewardGems} Gemmes ! L'unité suivante est débloquée.`;
                         }
@@ -1487,28 +1700,27 @@
                 let changed = false;
                 const isCurrentlyUnlocked = isAdminUnlocked();
                 const action = isCurrentlyUnlocked ? "REVERROUILLAGE" : "DÉBLOQUAGE";
+                
+                // Liste de toutes les leçons de cette page
+                const advancedLessons = Object.values(courseContent).flatMap(unit => Object.keys(unit.lessons));
 
                 if (isCurrentlyUnlocked) {
                     // --- Relock action (sur les leçons de cette page) ---
-                    for (const lessonId in userData.progress) {
-                        if (lessonId.startsWith('analyse-adv-') || lessonId.startsWith('validation-8') || lessonId.startsWith('validation-9')) {
-                             if (lessonId !== FIRST_ADVANCED_LESSON_ID) {
-                                userData.progress[lessonId] = 'locked';
-                             } else {
-                                // Garder la première leçon débloquée si la page 1 est terminée
-                                const mainPageComplete = userData.progress[UNLOCK_REQUIREMENT_ID] === 'completed';
-                                userData.progress[lessonId] = mainPageComplete ? 'active' : 'locked';
-                             }
+                    for (const lessonId of advancedLessons) {
+                        if (lessonId !== FIRST_ADVANCED_LESSON_ID) {
+                            userData.progress[lessonId] = 'locked';
+                        } else {
+                            // Garder la première leçon débloquée si la page 1 est terminée
+                            const mainPageComplete = userData.progress[UNLOCK_REQUIREMENT_ID] === 'completed';
+                            userData.progress[lessonId] = mainPageComplete ? 'active' : 'locked';
                         }
                     }
                 } else {
                     // --- Unlock action (sur les leçons de cette page) ---
-                    for (const unitId in courseContent) {
-                        for (const lessonId in courseContent[unitId].lessons) {
-                             if (userData.progress[lessonId] === 'locked') {
-                                userData.progress[lessonId] = 'active';
-                                changed = true;
-                            }
+                    for (const lessonId of advancedLessons) {
+                        if (userData.progress[lessonId] === 'locked') {
+                            userData.progress[lessonId] = 'active';
+                            changed = true;
                         }
                     }
                 }
@@ -1568,6 +1780,3 @@
     </script>
 </body>
 </html>
-
-
-
