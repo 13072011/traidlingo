@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TradeLingo - Master Class Expert</title>
+    <link rel="icon" type="image/png" href="./logo.png">
+    
+    <style>
+        /* --- Variables de couleur (Base identique + Couleurs Expert) --- */
+        :root {
+            --bg-primary: #f0f4f8;
+            --bg-secondary: #ffffff;
+            --text-color: #333;
+            --text-secondary: #666;
+            --border-color: #e5e5e5;
+
+            --green: #58a700;
+            --green-dark: #468400;
+            --red: #ea2b2b;
+            --blue: #007bff;
+            --blue-light: #d7eaff;
+            --gold: #ffc107;
+            --gold-dark: #c79100;
+            --grey-light: #f0f4f8; 
+            
+            /* Couleurs Spécifiques Expert */
+            --expert-black: #1a1a1a;
+            --expert-gold: #d4af37;
+            --expert-platinum: #e5e4e2;
+        }
+
+        body.dark-mode {
+            --bg-primary: #0a0a0a; /* Plus sombre pour le mode expert */
+            --bg-secondary: #161616;
+            --text-color: #f0f0f0;
+            --text-secondary: #aaaaaa;
+            --border-color: #333333;
+            --grey-light: #2c2c2c; 
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-primary);
+            margin: 0;
+            padding-top: 70px;
+            padding-bottom: 20px;
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* --- Header --- */
+        .top-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--bg-secondary);
+            border-bottom: 2px solid var(--expert-gold); /* Bordure dorée pour le mode expert */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            height: 50px;
+            box-shadow: 0 2px 10px rgba(212, 175, 55, 0.2); /* Ombre dorée légère */
+            z-index: 100;
+        }
+        .stats-group { display: flex; gap: 10px; }
+        .stat { font-size: 1.1rem; font-weight: bold; display: flex; align-items: center; }
+        .stat span { margin-left: 5px; min-width: 15px; }
+        .stat-icon { font-size: 1.3rem; }
+        
+        .titre { display: none; }
+        .titre h1 { 
+            font-size: 1.2rem; 
+            background: linear-gradient(to right, var(--expert-gold), #fff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .header-controls { display: flex; gap: 5px; align-items: center; }
+        #dark-mode-toggle, #admin-unlock-btn {
+            width: 35px; height: 35px; background: var(--bg-primary); color: var(--text-color);
+            border: 2px solid var(--border-color); padding: 5px; border-radius: 50%;
+            cursor: pointer; transition: all 0.2s;
+        }
+
+        /* --- Parcours --- */
+        .learning-path {
+            padding: 20px 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+        .unit-container {
+            width: 95%; max-width: 400px; margin-bottom: 15px; text-align: center;
+        }
+        
+        /* Styles des Titres d'Unités EXPERT (Look Premium) */
+        .unit-title {
+            padding: 10px;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        /* Unité 14 : Macro */
+        .unit-container:nth-child(1) .unit-title { 
+            background: linear-gradient(135deg, #1c1c1c, #4a4a4a);
+            color: white;
+            border-bottom: 3px solid #777;
+        }
+        /* Unité 15 : Options Grecques */
+        .unit-container:nth-child(2) .unit-title { 
+            background: linear-gradient(135deg, #2c3e50, #4ca1af);
+            color: white;
+        }
+        /* Unité 16 : Gestion Portefeuille */
+        .unit-container:nth-child(3) .unit-title { 
+            background: linear-gradient(135deg, #8e2de2, #4a00e0);
+            color: white;
+        }
+        /* Unité 17 : Microstructure */
+        .unit-container:nth-child(4) .unit-title { 
+            background: linear-gradient(135deg, #000000, #434343);
+            color: var(--expert-gold);
+            border: 1px solid var(--expert-gold);
+        }
+        /* Unité 18 : Certification Finale */
+        .unit-container:nth-child(5) .unit-title { 
+            background: linear-gradient(135deg, var(--expert-gold), #fffac0, var(--expert-gold));
+            color: #000;
+            text-shadow: none;
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
+            animation: shine 3s infinite linear;
+        }
+        
+        @keyframes shine {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 200% 50%; }
+        }
+
+        /* Noeuds de leçon */
+        .lesson-node {
+            width: 60px; height: 60px; border-radius: 50%; border: 4px solid;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2rem; margin: 8px auto; position: relative;
+            background-color: var(--bg-secondary);
+            z-index: 2;
+        }
+        .lesson-node.validation { font-size: 1.8rem; margin-top: 25px; border-style: dashed; }
+        
+        .connector {
+            height: 25px; width: 3px; background-color: var(--border-color);
+            margin: -4px auto; border-radius: 2px; z-index: 1;
+        }
+        .validation-connector {
+            height: 10px; margin: 0 auto; background-color: transparent;
+            border-left: 2px dashed var(--border-color);
+        }
+        
+        /* États */
+        .lesson-node.locked {
+            background-color: var(--grey-light); border-color: #b0b0b0; color: #b0b0b0; cursor: not-allowed;
+        }
+        .lesson-node.active {
+            background-color: var(--expert-black);
+            border-color: var(--expert-gold);
+            color: var(--expert-gold);
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+        }
+        body.light-mode .lesson-node.active {
+            background-color: #333; /* Contraste pour mode clair */
+            color: #fff;
+        }
+        .lesson-node.active:hover { transform: scale(1.05); }
+        
+        .lesson-node.completed {
+            background-color: var(--expert-gold);
+            border-color: #b38f00;
+            color: #000;
+        }
+
+        /* --- Modal --- */
+        .lesson-modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.9); z-index: 200;
+            justify-content: center; align-items: center;
+        }
+        .lesson-content {
+            background-color: var(--bg-secondary); color: var(--text-color);
+            width: 100%; max-width: 500px; height: 100%; max-height: 100vh;
+            display: flex; flex-direction: column; position: relative;
+        }
+        @media (min-width: 600px) {
+            .lesson-content { height: auto; max-height: 90vh; border-radius: 15px; width: 90%; }
+        }
+        
+        #lesson-header { padding: 15px; border-bottom: 2px solid var(--border-color); }
+        #lesson-body-container { flex-grow: 1; overflow-y: auto; padding: 0 15px; }
+        
+        .course-explanation { padding: 15px 0; line-height: 1.6; }
+        .course-explanation h3 { color: var(--expert-gold); margin-top: 0; }
+        body.light-mode .course-explanation h3 { color: #b38f00; }
+        
+        .explanation-next-btn {
+            width: 100%; padding: 12px; border: none; border-radius: 10px;
+            font-size: 1rem; font-weight: bold; color: #000;
+            background-color: var(--expert-gold);
+            border-bottom: 3px solid #b38f00; cursor: pointer; margin-top: 15px;
+        }
+
+        /* Questions */
+        #question-area { display: none; padding: 15px 0; }
+        .choice-button {
+            width: 100%; padding: 12px; margin: 8px 0;
+            background-color: var(--grey-light);
+            border: 2px solid var(--border-color); border-bottom-width: 3px;
+            border-radius: 10px; cursor: pointer; text-align: left;
+            font-weight: bold; color: var(--text-color);
+        }
+        .choice-button.selected {
+            background-color: #fffac0; border-color: var(--expert-gold);
+        }
+        .input-answer {
+            width: 100%; padding: 12px; margin-top: 15px;
+            border: 2px solid var(--border-color); border-radius: 10px;
+            background: var(--bg-secondary); color: var(--text-color);
+            box-sizing: border-box;
+        }
+        
+        /* Feedback Footer */
+        .feedback-footer {
+            padding: 15px; background-color: var(--grey-light);
+            border-top: 2px solid var(--border-color);
+        }
+        .feedback-footer.correct { background-color: #d7ffb8; }
+        .feedback-footer.incorrect { background-color: #ffe2e2; }
+        body.dark-mode .feedback-footer.correct { background-color: #1b3300; }
+        body.dark-mode .feedback-footer.incorrect { background-color: #330000; }
+
+        .footer-btn {
+            width: 100%; padding: 12px; border: none; border-radius: 10px;
+            font-size: 1rem; font-weight: bold; cursor: pointer;
+            border-bottom: 3px solid rgba(0,0,0,0.2);
+            color: white;
+        }
+        .footer-btn#check-answer-btn { background-color: var(--text-secondary); color: white; }
+        .footer-btn#check-answer-btn:not(:disabled) { background-color: var(--expert-gold); color: black; border-color: #b38f00; }
+        
+        .footer-btn.correct-btn { background-color: var(--green); }
+        .footer-btn.incorrect-btn { background-color: var(--red); }
+        
+        #close-lesson-btn {
+            position: absolute; top: 10px; right: 10px; background: none; border: none;
+            font-size: 1.5rem; color: var(--text-secondary); cursor: pointer;
+        }
+
+        /* --- Footer Menu --- */
+        .footer {
+            position: fixed; bottom: 0; left: 0; width: 100%;
+            background-color: var(--bg-secondary);
+            border-top: 2px solid var(--border-color);
+            display: flex; justify-content: center; align-items: center;
+            height: 50px; padding: 5px 0; z-index: 100;
+        }
+        .footer-btn-group { display: flex; gap: 15px; }
+        .nav-btn {
+            height: 40px; width: 40px; border-radius: 10px;
+            background: var(--bg-primary); color: var(--text-color);
+            border: 2px solid var(--border-color); font-size: 1.2rem;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+        }
+        .nav-btn.active-page {
+            background-color: var(--expert-gold); color: black; border-color: #b38f00;
+        }
+
+        /* Media Queries pour Desktop */
+        @media (min-width: 600px) {
+            body { padding-top: 80px; }
+            .top-bar { padding: 10px 30px; height: 60px; }
+            .titre { display: block; position: absolute; left: 50%; transform: translateX(-50%); }
+            .learning-path { padding: 30px; }
+            .lesson-node { width: 70px; height: 70px; font-size: 2.5rem; }
+            .connector { height: 35px; }
+        }
+    </style>
+</head>
+
+<body class="light-mode">
+
+    <header class="top-bar">
+        <div class="stats-group">
+            <div class="stat"><span class="stat-icon" style="color:orange;">🔥</span><span id="streak-count">0</span></div>
+            <div class="stat"><span class="stat-icon" style="color:skyblue;">💎</span><span id="gem-count">0</span></div>
+            <div class="stat"><span class="stat-icon" style="color:red;">❤️</span><span id="life-count">5</span></div>
+        </div>
+        <div class="titre">
+            <h1>TRADLINGO EXPERT</h1>
+        </div>
+        <div class="header-controls">
+            <button id="admin-unlock-btn" title="Débloquer (Dev)">🔓</button>
+            <button id="dark-mode-toggle">🌙</button>
+        </div>
+    </header>
+
+    <main class="learning-path" id="learning-path">
+        </main>
+
+    <div class="lesson-modal" id="lesson-modal">
+        <div class="lesson-content">
+            <button id="close-lesson-btn">✕</button>
+            <header id="lesson-header">
+                <h2 id="lesson-title">Titre</h2>
+            </header>
+            <div id="lesson-body-container"></div>
+            <footer class="feedback-footer" id="feedback-footer"></footer>
+        </div>
+    </div>
+    
+    <footer class="footer">
+        <div class="footer-btn-group">
+            <a href="index.html"><button class="nav-btn">🏠</button></a>
+            <a href="page2.html"><button class="nav-btn">📈</button></a>
+            <a href="page3.html"><button class="nav-btn active-page">🎓</button></a>
+        </div>
+    </footer>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Configuration ---
+            const LIFE_MAX = 5;
+            const LIFE_PACK_COST = 100;
+            const QUESTIONS_PER_VALIDATION = 5;
+            
+            // ID requis pour débloquer cette page (La validation finale de la Page 2)
+            const UNLOCK_REQUIREMENT_ID = 'validation-13'; 
+            // Première leçon de cette page
+            const FIRST_EXPERT_LESSON_ID = 'macro-1';
+
+            // --- 1. Contenu Expert (Unités 14 à 18) ---
+            const courseContent = {
+                'unit-14': {
+                    title: "Unité 14 : Macroéconomie",
+                    lessons: {
+                        'macro-1': {
+                            icon: '🏦',
+                            title: "Banques Centrales & Taux",
+                            type: 'standard',
+                            content: `
+                                <h3>Les Maîtres du Jeu</h3>
+                                <p>Le marché ne bouge pas par magie. Il réagit aux flux d'argent contrôlés par les <strong>Banques Centrales</strong> (FED aux USA, BCE en Europe).</p>
+                                <p>Leur outil principal est le <strong>Taux Directeur</strong> :</p>
+                                <ul>
+                                    <li><strong>Taux bas :</strong> Emprunt facile, stimule l'économie, bon pour les actions (Risk-On).</li>
+                                    <li><strong>Taux élevés :</strong> Emprunt cher, ralentit l'inflation, mauvais pour les actions (Risk-Off).</li>
+                                </ul>
+                            `,
+                            questions: [
+                                { type: 'mcq', text: "Quelle institution contrôle les taux directeurs aux États-Unis ?", choices: ["Le FMI", "La FED (Réserve Fédérale)", "Wall Street", "La Maison Blanche"], answer: "La FED (Réserve Fédérale)" },
+                                { type: 'input', text: "Quand les taux d'intérêt montent, le coût de l'emprunt devient plus...", answer: "Cher" }
+                            ]
+                        },
+                        'macro-2': {
+                            icon: '🎈',
+                            title: "L'Inflation (CPI)",
+                            type: 'standard',
+                            content: `
+                                <h3>Inflation et Marchés</h3>
+                                <p>L'<strong>Inflation</strong> est la perte de pouvoir d'achat de la monnaie. Elle est mesurée par l'indice <strong>CPI</strong> (Consumer Price Index).</p>
+                                <p>Si l'inflation est trop forte, la Banque Centrale augmente les taux pour 'refroidir' l'économie. C'est pourquoi une annonce d'inflation élevée (CPI) fait souvent chuter les marchés boursiers instantanément.</p>
+                            `,
+                            questions: [
+                                { type: 'mcq', text: "Quel indice mesure l'inflation aux USA ?", choices: ["RSI", "CPI", "GDP", "NFP"], answer: "CPI" },
+                                { type: 'input', text: "Une forte inflation entraîne généralement une... des taux d'intérêt.", answer: "Hausse" }
+                            ]
+                        },
+                        'validation-14': {
+                            icon: '🌍', title: "Validation : Macroéconomie", type: 'validation', unitToValidate: 'unit-14', passRate: 0.8, questions: []
+                        }
+                    }
+                },
+                'unit-15': {
+                    title: "Unité 15 : Options (Les Grecques)",
+                    lessons: {
+                        'greeks-1': {
+                            icon: 'Δ',
+                            title: "Delta et Gamma",
+                            type: 'standard',
+                            content: `
+                                <h3>Mathématiques des Options</h3>
+                                <p>Pour trader les options sérieusement, il faut comprendre les 'Grecques' :</p>
+                                <ul>
+                                    <li><strong>Delta :</strong> Mesure de combien le prix de l'option change si l'actif sous-jacent bouge de 1€. (C'est aussi la probabilité que l'option finisse 'dans la monnaie').</li>
+                                    <li><strong>Gamma :</strong> Mesure la vitesse à laquelle le Delta change. C'est l'accélération du prix de l'option.</li>
+                                </ul>
+                            `,
+                            questions: [
+                                { type: 'mcq', text: "Quelle Grecque mesure la variation du prix de l'option par rapport au prix de l'action ?", choices: ["Theta", "Vega", "Delta", "Rho"], answer: "Delta" },
+                                { type: 'input', text: "Le Gamma mesure l'accélération du...", answer: "Delta" }
+                            ]
+                        },
+                        'greeks-2': {
+                            icon: '⏳',
+                            title: "Theta (Dépréciation Temporelle)",
+                            type: 'standard',
+                            content: `
+                                <h3>Theta : L'Ennemi du Temps</h3>
+                                <p>Le <strong>Theta</strong> mesure la perte de valeur d'une option à mesure que le temps passe (Time Decay).</p>
+                                <p>Une option est comme un glaçon : elle fond chaque jour. Si vous achetez des options, le Theta joue contre vous. Si vous vendez des options, le Theta vous enrichit chaque jour où le marché ne bouge pas.</p>
+                            `,
+                            questions: [
+                                { type: 'mcq', text: "Le Theta représente...", choices: ["La volatilité", "Le temps qui passe (Time Decay)", "Le taux d'intérêt", "Le prix de l'action"], answer: "Le temps qui passe (Time Decay)" },
+                                { type: 'mcq', text: "Pour qui le Theta est-il un avantage ?", choices: ["L'acheteur d'option", "Le vendeur d'option", "Le courtier", "Personne"], answer: "Le vendeur d'option" }
+                            ]
+                        },
+                        'validation-15': {
+                            icon: '🏛️', title: "Validation : Les Grecques", type: 'validation', unitToValidate: 'unit-15', passRate: 0.8, questions: []
+                        }
+                    }
+                },
+                'unit-16': {
+                    title: "Unité 16 : Gestion de Portefeuille Pro",
+                    lessons: {
+                        'portfolio-1': {
+                            icon: '📐',
+                            title: "Critère de Kelly",
+                            type: 'standard',
+                            content: `
+                                <h3>La Formule de la Taille de Mise</h3>
+                                <p>Le <strong>Critère de Kelly</strong> est une formule mathématique utilisée pour déterminer la taille optimale d'une position pour maximiser la croissance du capital à long terme.</p>
+                                <p>Il prend en compte votre probabilité de gain (Win Rate) et votre ratio Risque/Rendement. Attention : Le 'Full Kelly' est très volatil, les pros utilisent souvent le 'Half-Kelly' (diviser le résultat par 2 pour plus de sécurité).</p>
+                            `,
+                            questions: [
+                                { type: 'mcq', text: "Le Critère de Kelly sert à calculer...", choices: ["Le point d'entrée", "La direction du marché", "La taille optimale de la position", "Les impôts"], answer: "La taille optimale de la position" },
+                                { type: 'input', text: "Pour réduire la volatilité du Critère de Kelly, on utilise souvent le... Kelly.", answer: "Half" }
+                            ]
+                        },
+                        'portfolio-2': {
+                            icon: '🔪',
+                            title: "Ratio de Sharpe",
+                            type: 'standard',
+                            content: `
+                                <h3>Mesurer la Performance Réelle</h3>
+                                <p>Gagner de l'argent ne suffit pas. Il faut savoir combien de risque a été pris pour gagner cet argent.</p>
+                                <p>Le <strong>Ratio de Sharpe</strong> mesure le rendement excédentaire par unité de risque (volatilité). Un ratio > 1 est bon, > 2 est excellent. Si vous faites +20% mais avec des variations de portefeuille terrifiantes, votre Sharpe sera mauvais.</p>
+                            `,
+                            questions: [
+                                { type: 'mcq', text: "Que mesure le Ratio de Sharpe ?", choices: ["Le profit brut", "Le rendement ajusté au risque", "Le nombre de trades gagnants", "Les frais de courtage"], answer: "Le rendement ajusté au risque" },
+                                { type: 'input', text: "Un Ratio de Sharpe élevé indique une performance... (Bonne/Mauvaise)", answer: "Bonne" }
+                            ]
+                        },
+                        'validation-16': {
+                            icon: '💼', title: "Validation : Gestion Pro", type: 'validation', unitToValidate: 'unit-16', passRate: 0.8, questions: []
+                        }
+                    }
+                },
+                'unit-17': {
+                    title: "Unité 17 : Microstructure",
+                    lessons: {
+                        'micro-1': {
+                            icon: '🕶️',
+                            title: "Dark Pools",
+                            type: 'standard',
+                            content: `
+                                <h3>Les Marchés Cachés</h3>
+                                <p>Environ 40% des transactions boursières aux USA ne se font pas sur les bourses publiques (comme le NYSE), mais dans des <strong>Dark Pools</strong>.</p>
+                                <p>Ce sont des bourses privées où les institutions s'échangent de gros blocs d'actions sans afficher leurs intentions au public avant que la transaction ne soit faite. Cela évite de faire paniquer le marché.</p>
+                            `,
+                            questions: [
+                                { type: 'mcq', text: "Qu'est-ce qu'un Dark Pool ?", choices: ["Une piscine illégale", "Une bourse privée pour institutionnels", "Un crash boursier", "Un logiciel de piratage"], answer: "Une bourse privée pour institutionnels" },
+                                { type: 'input', text: "Les Dark Pools permettent de cacher l'intention d'achat avant l'... de la transaction.", answer: "Exécution" }
+                            ]
+                        },
+                        'validation-17': {
+                            icon: '📡', title: "Validation : Microstructure", type: 'validation', unitToValidate: 'unit-17', passRate: 0.8, questions: []
+                        }
+                    }
+                },
+                'unit-18': {
+                    title: "CERTIFICATION FINALE",
+                    lessons: {
+                        'exam-final': {
+                            icon: '🎓',
+                            title: "Examen Maître Trader",
+                            type: 'validation',
+                            unitToValidate: 'unit-18', // Cas spécial : mélanger tout
+                            passRate: 0.9, // 90% requis !
+                            questions: []
+                        }
+                    }
+                }
+            };
+
+            // --- 2. Données Utilisateur ---
+            // On reprend la structure existante et on ajoute les clés pour Page 3
+            const defaultUserData = {
+                streak: 0, gems: 100, lives: 5,
+                progress: {
+                    // Les clés des pages précédentes sont supposées exister dans le localStorage
+                    // Ici on ajoute les défauts pour Page 3
+                    'macro-1': 'locked', 'macro-2': 'locked', 'validation-14': 'locked',
+                    'greeks-1': 'locked', 'greeks-2': 'locked', 'validation-15': 'locked',
+                    'portfolio-1': 'locked', 'portfolio-2': 'locked', 'validation-16': 'locked',
+                    'micro-1': 'locked', 'validation-17': 'locked',
+                    'exam-final': 'locked'
+                }
+            };
+
+            let userData = loadUserData();
+            
+            // --- DOM Elements ---
+            const bodyEl = document.body;
+            const learningPathEl = document.getElementById('learning-path');
+            const lessonModalEl = document.getElementById('lesson-modal');
+            const lessonTitleEl = document.getElementById('lesson-title');
+            const lessonBodyContainerEl = document.getElementById('lesson-body-container');
+            const feedbackFooterEl = document.getElementById('feedback-footer');
+            const closeLessonBtn = document.getElementById('close-lesson-btn');
+            const darkModeToggle = document.getElementById('dark-mode-toggle');
+            const adminUnlockBtn = document.getElementById('admin-unlock-btn');
+            
+            // --- State ---
+            let currentLessonId, currentUnitId, currentQuestionIndex = 0;
+            let currentValidationQuestions = [], currentSessionType = 'lesson';
+            let selectedAnswer = null;
+
+            // --- Fonctions Principales ---
+
+            function loadUserData() {
+                const saved = localStorage.getItem('tradeLingoUser');
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    // Fusionner pour être sûr d'avoir les nouvelles clés
+                    return { ...defaultUserData, ...parsed, progress: { ...defaultUserData.progress, ...parsed.progress } };
+                }
+                return { ...defaultUserData };
+            }
+
+            function saveUserData() {
+                localStorage.setItem('tradeLingoUser', JSON.stringify(userData));
+                updateUI();
+            }
+
+            function updateUI() {
+                document.getElementById('life-count').innerText = userData.lives;
+                document.getElementById('gem-count').innerText = userData.gems;
+                document.getElementById('streak-count').innerText = userData.streak;
+            }
+
+            // --- Rendu du Parcours ---
+            function renderLearningPath() {
+                learningPathEl.innerHTML = '';
+                
+                // Vérification d'accès global à la page
+                if (userData.progress[UNLOCK_REQUIREMENT_ID] !== 'completed' && userData.progress[FIRST_EXPERT_LESSON_ID] === 'locked') {
+                    learningPathEl.innerHTML = `
+                        <div style="text-align:center; padding:40px; background:var(--bg-secondary); border-radius:15px; border:2px solid var(--border-color);">
+                            <h2 style="color:var(--text-secondary);">Accès Restreint ⛔</h2>
+                            <p>Terminez la Page 2 (Validation Finale) pour accéder au niveau Maître.</p>
+                            <a href="page2.html"><button class="explanation-next-btn">Retourner à l'entrainement</button></a>
+                        </div>`;
+                    return;
+                }
+                
+                // Si accès autorisé, débloquer la première leçon si nécessaire
+                if (userData.progress[UNLOCK_REQUIREMENT_ID] === 'completed' && userData.progress[FIRST_EXPERT_LESSON_ID] === 'locked') {
+                    userData.progress[FIRST_EXPERT_LESSON_ID] = 'active';
+                    saveUserData();
+                }
+
+                // Génération des bulles
+                for (const [unitId, unitData] of Object.entries(courseContent)) {
+                    const unitDiv = document.createElement('div');
+                    unitDiv.className = 'unit-container';
+                    unitDiv.innerHTML = `<h3 class="unit-title">${unitData.title}</h3>`;
+                    
+                    let isFirst = true;
+                    for (const [lessonId, lessonData] of Object.entries(unitData.lessons)) {
+                        const status = userData.progress[lessonId] || 'locked';
+                        
+                        if (!isFirst) {
+                            const conn = document.createElement('div');
+                            conn.className = lessonData.type === 'validation' ? 'validation-connector' : 'connector';
+                            unitDiv.appendChild(conn);
+                        }
+                        isFirst = false;
+
+                        const node = document.createElement('div');
+                        node.className = `lesson-node ${status} ${lessonData.type === 'validation' ? 'validation' : ''}`;
+                        node.innerHTML = `<span>${status === 'completed' ? (lessonId === 'exam-final' ? '🎓' : '✔️') : lessonData.icon}</span>`;
+                        
+                        if (status !== 'locked') {
+                            node.onclick = () => openLesson(unitId, lessonId);
+                        }
+                        unitDiv.appendChild(node);
+                    }
+                    learningPathEl.appendChild(unitDiv);
+                }
+            }
+
+            // --- Logique Leçon / Quiz ---
+            function openLesson(unitId, lessonId) {
+                currentUnitId = unitId;
+                currentLessonId = lessonId;
+                const lesson = courseContent[unitId].lessons[lessonId];
+                const status = userData.progress[lessonId];
+
+                if (lesson.type === 'validation') {
+                    currentSessionType = 'validation';
+                    startValidation(unitId, lesson);
+                } else if (status === 'completed') {
+                    currentSessionType = 'practice';
+                    startPractice(lesson);
+                } else {
+                    if (userData.lives <= 0) { alert("Plus de vies !"); return; }
+                    currentSessionType = 'lesson';
+                    showExplanation(lesson);
+                }
+                lessonModalEl.style.display = 'flex';
+            }
+
+            function showExplanation(lesson) {
+                lessonTitleEl.innerText = lesson.title;
+                lessonBodyContainerEl.innerHTML = `
+                    <div class="course-explanation">${lesson.content}
+                    <button class="explanation-next-btn" onclick="startQuiz()">Commencer</button></div>
+                    <div id="question-area"></div>`;
+                feedbackFooterEl.innerHTML = '';
+            }
+
+            // Note: Pour simplifier ce fichier, j'attache startQuiz au scope global ou via event listener
+            window.startQuiz = () => {
+                const lesson = courseContent[currentUnitId].lessons[currentLessonId];
+                // Préparation des questions
+                if (currentSessionType === 'lesson') currentValidationQuestions = lesson.questions;
+                currentQuestionIndex = 0;
+                document.querySelector('.course-explanation').style.display = 'none';
+                document.getElementById('question-area').style.display = 'block';
+                loadQuestion();
+            };
+
+            function startValidation(unitId, lesson) {
+                lessonTitleEl.innerText = "EXAMEN";
+                // Générer des questions (Mix de questions précédentes ou spécifiques)
+                // Pour simplifier ici : on suppose que 'unit-18' pioche dans tout
+                let pool = [];
+                if(unitId === 'unit-18') {
+                    // Pioche dans tout le contenu expert
+                    Object.values(courseContent).forEach(u => {
+                         Object.values(u.lessons).forEach(l => { if(l.questions) pool.push(...l.questions); });
+                    });
+                } else {
+                    // Pioche dans l'unité ciblée (unitToValidate)
+                   const targetUnit = courseContent[lesson.unitToValidate];
+                   if(targetUnit) Object.values(targetUnit.lessons).forEach(l => { if(l.questions) pool.push(...l.questions); });
+                }
+                
+                // Mélange
+                pool.sort(() => Math.random() - 0.5);
+                currentValidationQuestions = pool.slice(0, QUESTIONS_PER_VALIDATION);
+                
+                lessonBodyContainerEl.innerHTML = `
+                    <div class="course-explanation">
+                        <h3>Prêt pour le test ?</h3>
+                        <p>Réussite requise : ${lesson.passRate * 100}%</p>
+                        <button class="explanation-next-btn" onclick="startQuiz()">Lancer</button>
+                    </div><div id="question-area"></div>`;
+                feedbackFooterEl.innerHTML = '';
+            }
+            
+            function startPractice(lesson) {
+                 lessonTitleEl.innerText = "Pratique";
+                 currentValidationQuestions = [...lesson.questions].sort(() => Math.random() - 0.5);
+                 lessonBodyContainerEl.innerHTML = `<div id="question-area" style="display:block;"></div>`;
+                 currentQuestionIndex = 0;
+                 loadQuestion();
+            }
+
+            function loadQuestion() {
+                const q = currentValidationQuestions[currentQuestionIndex];
+                let html = `<p style="font-size:1.1rem; font-weight:bold; margin-bottom:15px;">${q.text}</p>`;
+                
+                if (q.type === 'mcq') {
+                    q.choices.sort(() => Math.random() - 0.5).forEach(c => {
+                        html += `<button class="choice-button" onclick="selectAnswer('${c.replace(/'/g, "\\'")}', this)">${c}</button>`;
+                    });
+                } else {
+                    html += `<input type="text" class="input-answer" oninput="selectAnswer(this.value, this)" placeholder="Votre réponse...">`;
+                }
+                document.getElementById('question-area').innerHTML = html;
+                feedbackFooterEl.innerHTML = `<button id="check-btn" class="footer-btn" disabled onclick="checkAnswer()">Vérifier</button>`;
+                selectedAnswer = null;
+            }
+
+            window.selectAnswer = (val, el) => {
+                selectedAnswer = val;
+                // Gestion visuelle simple
+                if(el.tagName === 'BUTTON') {
+                    document.querySelectorAll('.choice-button').forEach(b => b.classList.remove('selected'));
+                    el.classList.add('selected');
+                }
+                document.getElementById('check-btn').disabled = (val.trim() === '');
+            };
+
+            window.checkAnswer = () => {
+                const q = currentValidationQuestions[currentQuestionIndex];
+                let isCorrect = false;
+                if(q.type === 'mcq') isCorrect = (selectedAnswer === q.answer);
+                else isCorrect = (selectedAnswer.toLowerCase().trim() === q.answer.toLowerCase());
+                
+                // Save result for validation pass rate
+                q.userCorrect = isCorrect;
+
+                const msg = isCorrect ? "Excellent !" : `Faux. Réponse : ${q.answer}`;
+                const colorClass = isCorrect ? 'correct' : 'incorrect';
+                
+                // Feedback UI
+                feedbackFooterEl.className = `feedback-footer ${colorClass}`;
+                feedbackFooterEl.innerHTML = `
+                    <div style="margin-bottom:10px; font-weight:bold; color:${isCorrect ? 'var(--green-dark)' : 'var(--red)'}">${msg}</div>
+                    <button class="footer-btn ${colorClass}-btn" onclick="nextQuestion()">Continuer</button>
+                `;
+                
+                if(!isCorrect && currentSessionType === 'lesson') {
+                    userData.lives--;
+                    saveUserData();
+                }
+            };
+
+            window.nextQuestion = () => {
+                if(currentSessionType === 'lesson' && userData.lives <= 0) {
+                     closeLesson(); alert("Plus de vies !"); return;
+                }
+                
+                currentQuestionIndex++;
+                if (currentQuestionIndex < currentValidationQuestions.length) {
+                    loadQuestion();
+                } else {
+                    finishSession();
+                }
+            };
+
+            function finishSession() {
+                let success = true;
+                if(currentSessionType === 'validation') {
+                    const correctCount = currentValidationQuestions.filter(q => q.userCorrect).length;
+                    const needed = Math.ceil(currentValidationQuestions.length * courseContent[currentUnitId].lessons[currentLessonId].passRate);
+                    success = correctCount >= needed;
+                }
+                
+                let title = success ? "Session Terminée !" : "Échec";
+                let msg = success ? "+50 Gemmes 💎" : "Révisez encore.";
+                
+                if(success) {
+                    userData.gems += 50;
+                    if(currentSessionType !== 'practice') {
+                        userData.progress[currentLessonId] = 'completed';
+                        unlockNext(currentLessonId);
+                    }
+                    if(currentSessionType === 'practice') userData.lives = Math.min(5, userData.lives+1);
+                    saveUserData();
+                }
+
+                lessonBodyContainerEl.innerHTML = `
+                    <div style="text-align:center; padding:30px;">
+                        <h2 style="color:${success ? 'var(--green)' : 'var(--red)'}">${title}</h2>
+                        <p>${msg}</p>
+                    </div>`;
+                feedbackFooterEl.innerHTML = `<button class="footer-btn" onclick="closeLesson()">Terminer</button>`;
+            }
+
+            function unlockNext(currentId) {
+                // Logique linéaire simple pour ce fichier
+                const flatList = [];
+                Object.values(courseContent).forEach(u => flatList.push(...Object.keys(u.lessons)));
+                const idx = flatList.indexOf(currentId);
+                if(idx > -1 && idx < flatList.length - 1) {
+                    const nextId = flatList[idx+1];
+                    if(userData.progress[nextId] === 'locked') userData.progress[nextId] = 'active';
+                }
+            }
+
+            window.closeLesson = () => {
+                lessonModalEl.style.display = 'none';
+                renderLearningPath();
+                updateUI();
+            };
+
+            // Mode Sombre
+            function initTheme() {
+                if(localStorage.getItem('themeMode') === 'dark-mode') bodyEl.className = 'dark-mode';
+            }
+            darkModeToggle.onclick = () => {
+                bodyEl.classList.toggle('dark-mode');
+                localStorage.setItem('themeMode', bodyEl.className);
+            };
+            
+            // Admin Unlock
+            adminUnlockBtn.onclick = () => {
+                 Object.keys(userData.progress).forEach(k => userData.progress[k] = 'completed');
+                 saveUserData();
+                 renderLearningPath();
+            };
+
+            // Init
+            initTheme();
+            updateUI();
+            renderLearningPath();
+        });
+    </script>
+</body>
+</html>
