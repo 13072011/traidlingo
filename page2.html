@@ -549,6 +549,28 @@
             display: flex;
             gap: 10px;
         }
+        #page3-cta-container {
+            width: 95%;
+            max-width: 400px; /* Aligné sur la largeur max des unités */
+            margin: 30px auto 100px auto; /* Marge pour être visible au-dessus du footer fixe */
+            text-align: center;
+        }
+        .page3-link {
+            text-decoration: none; /* Enlève le soulignement du lien */
+        }
+        /* Style spécifique pour le bouton */
+        #next-page-btn {
+            background-color: var(--purple);
+            border-color: var(--purple-dark);
+            color: var(--bg-secondary);
+            font-size: 1.1rem;
+            padding: 15px; /* Rendre le bouton plus grand */
+            border-bottom-width: 4px; 
+        }
+        #next-page-btn:hover {
+            background-color: var(--purple-dark);
+            filter: none;
+        }
         /* ================================== */
 
 
@@ -709,7 +731,14 @@
     </header>
 
     <main class="learning-path" id="learning-path">
-        </main>
+    </main>
+    <div id="page3-cta-container">
+        <a href="page3.html" class="page3-link">
+            <button id="next-page-btn" class="footer-btn">
+                Passer aux Unités expert🏛️
+            </button>
+        </a>
+    </div>
 
     <div class="lesson-modal" id="lesson-modal">
         <div class="lesson-content">
@@ -1016,7 +1045,7 @@
                             title: "Validation Finale Avancée",
                             type: 'validation',
                             unitToValidate: 'unit-13',
-                            passRate: 0.8,
+                            passRate: 0.1,
                             questions: []
                         }
                     }
