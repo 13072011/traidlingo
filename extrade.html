@@ -3,73 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mon Site Trading - Chargement...</title> 
+    <title>TradeLingo - Salle de Marché</title> 
+    <link rel="icon" type="image/png" href="./logo.png">
     
     <style>
-        /* Définition des variables CSS pour une gestion facile des thèmes */
+        /* --- 1. Variables Globales (Identiques aux autres pages) --- */
         :root {
-            /* Variables par défaut (Mode Clair) */
-            --bg-primary: #F8F8F8;
-            --bg-secondary: #FFFFFF;
-            --border-color: #E0E0E0;
-            --text-color: #333333;
-            --text-secondary: #888;
-            --accent-color: #6C5CE7; /* Violet Clair */
-            --chart-bg: #FFFFFF;
+            /* Couleurs Base (Mode Clair par défaut dans le CSS, géré par data-theme ici) */
+            --bg-primary: #f0f4f8;
+            --bg-secondary: #ffffff;
+            --text-color: #333;
+            --text-secondary: #666;
+            --border-color: #e5e5e5;
+
+            --green: #58a700;
+            --green-dark: #468400;
+            --red: #ea2b2b;
+            --blue: #007bff;
+            --blue-light: #d7eaff;
+            --gold: #ffc107;
+            --purple: #6f42c1;
+            
+            /* Spécifique Extrade */
+            --chart-height: 70vh; /* Utilise 70% de la hauteur de la vue */
         }
 
-        /* Surcharge des variables pour le Mode Sombre */
+        /* Surcharge Mode Sombre */
         html[data-theme='dark'] {
             --bg-primary: #121212;
-            --bg-secondary: #1E1E1E;
+            --bg-secondary: #1e1e1e;
+            --text-color: #f0f0f0;
+            --text-secondary: #aaaaaa;
             --border-color: #333333;
-            --text-color: #E0E0E0;
-            --text-secondary: #AAAAAA;
-            --accent-color: #B300FF; /* Violet Profond */
-            --chart-bg: #1E1E1E;
         }
 
-        /* Styles de base */
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-            margin: 0;
-            padding: 70px 20px 20px 20px; /* Ajout d'un padding en haut pour la barre de navigation fixe */
-            text-align: center;
-            transition: background-color 0.3s, color 0.3s;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--bg-primary);
+            margin: 0;
+            padding-top: 70px; /* Espace pour le header fixe */
+            padding-bottom: 70px; /* Espace pour le footer fixe */
             color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
         }
 
-        h1 {
-            font-size: 2.5em;
-            margin-bottom: 20px;
-            transition: color 0.3s;
-            color: var(--text-color);
-        }
-
-        p {
-            font-size: 0.9em;
-            color: var(--text-secondary);
-        }
-        
-        /* Conteneur du graphique */
-        .tradingview-widget-container {
-            max-width: 1200px;
-            margin: 20px auto;
-            border-radius: 8px;
-            padding: 0; 
-            transition: background-color 0.3s;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            overflow: hidden; /* Pour contenir le widget TradingView */
-            background-color: var(--chart-bg);
-        }
-        
-        .controls {
-            margin-bottom: 30px;
-        }
-        
-        /* Barre de navigation fixe (Remplaçant l'ancien .footer) */
-        .nav-header { 
+        /* --- 2. Header Stats (Intégration TradeLingo) --- */
+        .top-bar {
             position: fixed;
             top: 0;
             left: 0;
@@ -79,192 +58,512 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 15px; 
+            padding: 10px 15px;
             height: 50px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
             z-index: 1000;
+            box-sizing: border-box;
+        }
+        .stats-group { display: flex; gap: 15px; }
+        .stat { font-size: 1.1rem; font-weight: bold; display: flex; align-items: center; }
+        .stat span { margin-left: 5px; }
+        .header-controls button {
+            background: var(--bg-primary); color: var(--text-color);
+            border: 2px solid var(--border-color); padding: 5px 10px;
+            border-radius: 20px; cursor: pointer; font-weight: bold;
         }
 
-        .menu-control{
-            display: flex;
-            gap: 10px; 
-            align-items: center;
-        }
-        
-        /* Boutons de navigation (🏠 et 💸) */
-        #home-btn {
-            width: 38px;
-            height: 38px;
-            line-height: 38px; /* Pour centrer l'icône */
-            background: var(--bg-primary);
-            color: var(--text-color);
+        /* --- 3. Contrôles Graphique --- */
+        .controls-container {
+            width: 95%; max-width: 1200px; margin: 20px auto 10px auto;
+            display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+            background: var(--bg-secondary); padding: 15px; border-radius: 10px;
             border: 2px solid var(--border-color);
-            padding: 0; 
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 1.2em;
-            transition: background-color 0.2s, border-color 0.2s, transform 0.1s;
         }
-        #home-btn:hover {
-            border-color: var(--accent-color);
-            transform: scale(1.05);
+        .input-group { display: flex; align-items: center; gap: 10px; flex-grow: 1; }
+        .input-group label { font-weight: bold; }
+        .chart-input {
+            padding: 10px; border-radius: 5px; border: 2px solid var(--border-color);
+            background: var(--bg-primary); color: var(--text-color); font-weight: bold;
+            width: 100%; max-width: 150px;
         }
+        .action-btn {
+            padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;
+            font-weight: bold; color: white; transition: transform 0.1s;
+        }
+        .action-btn:active { transform: scale(0.95); }
+        .btn-blue { background-color: var(--blue); }
+        .btn-green { background-color: var(--green); }
+        .btn-red { background-color: var(--red); }
+
+        /* --- 4. Container TradingView --- */
+        .tradingview-widget-container {
+            width: 95%; max-width: 1200px; height: var(--chart-height); /* UTILISE LA HAUTEUR CSS */
+            margin: 0 auto; border-radius: 10px; overflow: hidden;
+            border: 2px solid var(--border-color);
+            background-color: var(--bg-secondary);
+        }
+        #tradingview_chart_widget{
+            height: 100%; /* S'assure que le widget remplit son conteneur */
+        }
+
+        /* --- 5. Simulateur de Trading --- */
+        #trade-simulator {
+            width: 95%; max-width: 1200px; margin: 20px auto;
+            background: var(--bg-secondary); padding: 20px; border-radius: 10px;
+            border: 2px solid var(--border-color); box-sizing: border-box;
+        }
+        .sim-header {
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 2px solid var(--border-color); padding-bottom: 15px; margin-bottom: 15px;
+        }
+        .balance-display { font-size: 1.5rem; font-weight: bold; color: var(--gold); }
         
-        /* Bouton de bascule du thème */
-        #theme-toggle {
-            padding: 10px 25px;
-            border: none;
-            border-radius: 25px; 
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 1em;
-            letter-spacing: 0.5px;
-            transition: opacity 0.2s;
-            background-color: var(--accent-color);
-            color: white;
+        .trade-controls {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px;
+            margin-bottom: 20px;
         }
-        #theme-toggle:hover {
-            opacity: 0.9;
+        .trade-input-wrapper { display: flex; flex-direction: column; gap: 5px; }
+        .trade-input-wrapper label { font-size: 0.85rem; color: var(--text-secondary); }
+        
+        /* Table des positions */
+        .positions-table-container { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; min-width: 600px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border-color); }
+        th { color: var(--text-secondary); font-size: 0.9rem; }
+        .pl-green { color: var(--green); font-weight: bold; }
+        .pl-red { color: var(--red); font-weight: bold; }
+        .btn-small { padding: 5px 10px; font-size: 0.8rem; }
+
+        /* --- 6. Footer Nav (Identique) --- */
+        .footer {
+            position: fixed; bottom: 0; left: 0; width: 100%;
+            background-color: var(--bg-secondary);
+            border-top: 2px solid var(--border-color);
+            display: flex; justify-content: center; align-items: center;
+            height: 50px; padding: 5px 0; z-index: 1000;
         }
+        .footer-btn-group { display: flex; gap: 15px; }
+        .nav-btn {
+            height: 40px; width: 40px; border-radius: 10px;
+            background: var(--bg-primary); color: var(--text-color);
+            border: 2px solid var(--border-color); font-size: 1.2rem;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+        }
+        .nav-btn.active-page {
+            background-color: var(--blue); color: white; border-color: #0056b3;
+        }
+
     </style>
 </head>
 <body>
 
-    <header class="nav-header"> <div class="menu-control">
-            <a href="index.html"><button id="home-btn" title="Accueil">🏠</button></a>
-            <a href="extrade.html"><button id="home-btn" title="Graphique">💸</button></a>
+    <header class="top-bar">
+        <div class="stats-group">
+            <div class="stat"><span style="color:orange;">🔥</span><span id="streak-count">0</span></div>
+            <div class="stat"><span style="color:skyblue;">💎</span><span id="gem-count">0</span></div>
+            <div class="stat"><span style="color:red;">❤️</span><span id="life-count">5</span></div>
+        </div>
+        <div class="header-controls">
+            <button id="theme-toggle" onclick="toggleTheme()">🌙</button>
         </div>
     </header>
 
-    <h1 id="main-title">📈 Graphique Avancé...</h1> 
-
-    <div class="controls">
-        <button id="theme-toggle" onclick="toggleTheme()">Passer en Mode Clair ☀️</button>
+    <div class="controls-container">
+        <div class="input-group">
+            <label for="symbol-input">Symbole :</label>
+            <input type="text" id="symbol-input" class="chart-input" value="BTCUSDT" placeholder="Ex: BTCUSDT">
+            <button id="load-symbol-btn" class="action-btn btn-blue">Charger</button>
+        </div>
+        <div style="font-size: 0.9rem; color: var(--text-secondary);">
+            Données fournies par TradingView. Prix en direct (WebSocket) : BINANCE
+        </div>
     </div>
 
     <div class="tradingview-widget-container">
         <div id="tradingview_chart_widget"></div> 
-
-      <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
-      <script type="text/javascript">
-      
-      let tvWidget = null;
-      // Récupérer le thème initial à partir de l'attribut HTML
-      let currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
-
-      // Définir le symbole par défaut (celui qui est sur la capture d'écran)
-      const defaultSymbol = "BINANCE:BTCUSDT"; 
-
-      // ----------------------------------------------------
-      // 1. Fonction pour mettre à jour le titre
-      // ----------------------------------------------------
-      function updateTitle(symbolName) {
-          // Retire le préfixe de la bourse (ex: 'FX:', 'BINANCE:')
-          const cleanSymbol = symbolName.split(':')[1] || symbolName; 
-          
-          document.getElementById('main-title').innerText = `📈 Graphique Avancé ${cleanSymbol}`;
-          document.title = `${cleanSymbol} - Analyse de Trading`; 
-      }
-
-      // ----------------------------------------------------
-      // 2. Fonction d'initialisation du widget TradingView
-      // ----------------------------------------------------
-      function initWidget(theme) {
-          const container = document.getElementById('tradingview_chart_widget');
-          // On s'assure que le conteneur est vide avant de le recréer (nécessaire pour le changement de thème)
-          container.innerHTML = ''; 
-          
-          // La couleur de la barre d'outils doit correspondre au fond de la barre de navigation (.nav-header)
-          const toolbarBg = (theme === 'dark' ? "#1E1E1E" : "#FFFFFF"); 
-          
-          tvWidget = new TradingView.widget(
-          {
-            "width": "100%",
-            "height": "600",
-            "symbol": defaultSymbol, 
-            "interval": "D",
-            "timezone": "Europe/Paris",
-            "theme": theme, 
-            "style": "1",
-            "locale": "fr",
-            "toolbar_bg": toolbarBg,
-            "enable_publishing": false,
-            "allow_symbol_change": true,
-            "container_id": "tradingview_chart_widget"
-            // REMARQUE: onSymbolChange est omis car non supporté par ce widget.
-          });
-          
-          // Démarre l'observateur après le chargement initial du widget
-          observeSymbolChange();
-          updateTitle(defaultSymbol);
-      }
-
-      // ----------------------------------------------------
-      // 3. NOUVELLE FONCTION CLÉ : Observer le changement du symbole
-      // ----------------------------------------------------
-      function observeSymbolChange() {
-          const targetNode = document.getElementById('tradingview_chart_widget');
-          
-          // Vérifie si le conteneur existe
-          if (!targetNode) return;
-
-          // Configure l'observateur de mutation
-          const config = { attributes: true, attributeFilter: ['data-symbol'] };
-
-          const callback = function(mutationsList, observer) {
-              for(const mutation of mutationsList) {
-                  if (mutation.type === 'attributes' && mutation.attributeName === 'data-symbol') {
-                      const newSymbol = mutation.target.getAttribute('data-symbol');
-                      // Mise à jour si un nouveau symbole valide est trouvé
-                      if (newSymbol) {
-                          updateTitle(newSymbol);
-                      }
-                  }
-              }
-          };
-
-          // Crée l'instance d'observateur
-          const observer = new MutationObserver(callback);
-
-          // Démarre l'observation du nœud cible
-          observer.observe(targetNode, config);
-      }
-      
-      // ----------------------------------------------------
-      // 4. Fonction de bascule du thème
-      // ----------------------------------------------------
-      function toggleTheme() {
-          const htmlElement = document.documentElement;
-          const toggleButton = document.getElementById('theme-toggle');
-
-          if (currentTheme === 'dark') {
-              currentTheme = 'light';
-              htmlElement.setAttribute('data-theme', 'light');
-              toggleButton.innerHTML = "Passer en Mode Sombre 🌙";
-          } else {
-              currentTheme = 'dark';
-              htmlElement.setAttribute('data-theme', 'dark');
-              toggleButton.innerHTML = "Passer en Mode Clair ☀️";
-          }
-          // L'observateur sera redémarré dans initWidget
-          initWidget(currentTheme); 
-      }
-
-      // Initialisation au chargement de la page
-      document.addEventListener('DOMContentLoaded', () => {
-          // Définir le texte initial du bouton en fonction du thème initial
-          if (currentTheme === 'dark') {
-             document.getElementById('theme-toggle').innerHTML = "Passer en Mode Clair ☀️";
-          } else {
-             document.getElementById('theme-toggle').innerHTML = "Passer en Mode Sombre 🌙";
-          }
-          // Initialise le widget avec le symbole BTCUSDT par défaut
-          initWidget(currentTheme); 
-      });
-
-      </script>
     </div>
 
-    <p style="margin-top: 40px;">Ce graphique est fourni gratuitement par TradingView.</p>
+    <div id="trade-simulator">
+        <div class="sim-header">
+            <div>
+                <h3>Simulateur de Trading</h3>
+                <p style="margin:0; font-size:0.9rem;">Entraînez-vous sans risque (Capital Virtuel)</p>
+            </div>
+            <div class="balance-display" id="sim-balance">10,000 $</div>
+        </div>
+
+        <div class="trade-controls">
+             <div class="trade-input-wrapper">
+                <label style="font-weight: bold; color: var(--blue);">Prix Actuel du Marché</label>
+                <div id="display-current-price" style="font-size: 1.2rem; font-weight: bold;">... Connexion ...</div> 
+            </div>
+            <div class="trade-input-wrapper">
+                <label>Quantité / Montant ($)</label>
+                <input type="number" id="trade-amount" class="chart-input" placeholder="Ex: 1000">
+            </div>
+            <div class="trade-input-wrapper" style="justify-content: flex-end;">
+                <button onclick="executeTrade('buy')" class="action-btn btn-green" style="width:100%">ACHETER (Long)</button>
+            </div>
+            <div class="trade-input-wrapper" style="justify-content: flex-end;">
+                <button onclick="executeTrade('sell')" class="action-btn btn-red" style="width:100%">VENDRE (Short)</button>
+            </div>
+        </div>
+
+        <div class="positions-table-container">
+            <h4>Positions Ouvertes</h4>
+            <table id="positions-table">
+                <thead>
+                    <tr>
+                        <th>Symbole</th>
+                        <th>Type</th>
+                        <th>Entrée</th>
+                        <th>P&L Flottant</th> 
+                        <th>Taille</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="positions-body">
+                    <tr><td colspan="6" style="text-align:center;">Aucune position ouverte</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <footer class="footer">
+        <div class="footer-btn-group">
+            <a href="index.html"><button class="nav-btn">🏠</button></a>
+            <a href="page2.html"><button class="nav-btn">📈</button></a>
+            <a href="extrade.html"><button class="nav-btn active-page">💸</button></a>
+        </div>
+    </footer>
+
+<script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+    <script>
+        // --- GESTION UTILISATEUR (TradeLingo) ---
+        const defaultUserData = { streak: 0, gems: 100, lives: 5, progress: {} };
+
+        function loadUserData() {
+            const saved = localStorage.getItem('tradeLingoUser');
+            return saved ? JSON.parse(saved) : defaultUserData;
+        }
+
+        function updateStatsUI() {
+            const userData = loadUserData();
+            document.getElementById('life-count').innerText = userData.lives;
+            document.getElementById('gem-count').innerText = userData.gems;
+            document.getElementById('streak-count').innerText = userData.streak;
+        }
+
+        // --- GESTION GRAPHIQUE & PRIX EN TEMPS RÉEL (WebSocket) ---
+        let tvWidget = null;
+        let currentSymbol = localStorage.getItem('lastSymbol') || "BTCUSDT"; 
+        let currentPrice = 0; 
+        let currentWebSocket = null; 
+
+        function initWidget(theme, symbol) {
+            const container = document.getElementById('tradingview_chart_widget');
+            // Mieux vaut ne pas nettoyer le container avant de vérifier si le widget existe
+            if (tvWidget) {
+                // Si le widget existe, tentez d'utiliser son API pour changer le symbole (plus propre)
+                try {
+                    tvWidget.onChartReady(() => {
+                        tvWidget.setSymbol(`BINANCE:${symbol}`);
+                    });
+                    console.log(`TradingView: Symbole changé via API pour BINANCE:${symbol}`);
+                    return; // Sortir si le symbole a été mis à jour
+                } catch (e) {
+                    console.error("Erreur lors de la mise à jour du symbole via l'API TradingView, rechargement complet.", e);
+                    container.innerHTML = ''; // Nettoyer pour recharger
+                }
+            } else {
+                 container.innerHTML = ''; // Nettoyer si c'est la première init
+            }
+            
+            // Rechargement complet du widget
+            const tvSymbol = symbol.includes(':') ? symbol : `BINANCE:${symbol}`; 
+            const toolbarBg = (theme === 'dark' ? "#1e1e1e" : "#ffffff"); 
+
+            tvWidget = new TradingView.widget({
+                "width": "100%",
+                "height": "500px", 
+                "symbol": tvSymbol, 
+                "interval": "D",
+                "timezone": "Europe/Paris",
+                "theme": theme,
+                "style": "1",
+                "locale": "fr",
+                "toolbar_bg": toolbarBg,
+                "enable_publishing": false,
+                "allow_symbol_change": false,
+                "container_id": "tradingview_chart_widget",
+                "hide_side_toolbar": false
+            });
+            console.log(`TradingView: Widget créé pour ${tvSymbol}`);
+        }
+
+        /**
+         * Ouvre une connexion WebSocket pour obtenir les prix en direct de Binance.
+         */
+        function startWebSocket(symbol) {
+            // 1. Fermer la connexion précédente si elle existe
+            if (currentWebSocket) {
+                currentWebSocket.close(1000, "Nouveau symbole chargé."); // Code 1000: fermeture normale
+                currentWebSocket = null;
+            }
+            
+            // Assurez-vous que le prix est remis à zéro pendant la connexion
+            currentPrice = 0;
+            
+            // Binance utilise des symboles en minuscules pour les WebSockets
+            const wsSymbol = symbol.toLowerCase().replace('binance:', '');
+            
+            if (wsSymbol.length < 5) {
+                 document.getElementById('display-current-price').innerText = `Symbole court invalide (${symbol}). Tentez BTCUSDT.`;
+                 return;
+            }
+
+            // 2. Créer la nouvelle connexion
+            const wsURL = `wss://stream.binance.com:9443/ws/${wsSymbol}@trade`; 
+            
+            console.log(`Tentative de connexion WebSocket à: ${wsURL}`); // LOG DE DÉBOGAGE
+            
+            currentWebSocket = new WebSocket(wsURL);
+            currentWebSocket.symbol = symbol; 
+
+            document.getElementById('display-current-price').innerText = '... Connexion ...';
+
+            // 3. Gestion des messages (Nouveau prix reçu)
+            currentWebSocket.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                // Vérifier si le message est une donnée de trade
+                if (data && data.p) { 
+                    const latestPrice = parseFloat(data.p);
+                    
+                    if (!isNaN(latestPrice)) {
+                        currentPrice = latestPrice;
+                        // Mettre à jour avec une gestion du format (ex: si le prix est très petit)
+                        const precision = latestPrice > 1 ? 2 : 4; 
+                        document.getElementById('display-current-price').innerText = currentPrice.toFixed(precision) + ' $';
+                        
+                        updateFloatingPnlUI(); 
+                    }
+                } else if (data && data.e === 'error') {
+                     // Binance envoie parfois une erreur si le symbole n'existe pas
+                     console.error("Erreur reçue de Binance:", data);
+                     currentWebSocket.close(1000, "Symbole non trouvé par Binance.");
+                }
+            };
+
+            // 4. Gestion des événements de connexion
+            currentWebSocket.onopen = () => {
+                console.log(`WebSocket connecté pour ${symbol}. Attente du premier prix...`);
+            };
+
+            currentWebSocket.onerror = (error) => {
+                console.error(`Erreur WebSocket (générique) pour ${symbol}:`, error);
+                document.getElementById('display-current-price').innerText = `[ERREUR] Impossible de se connecter au serveur.`;
+            };
+            
+            currentWebSocket.onclose = (event) => {
+                console.log(`WebSocket déconnecté pour ${symbol}. Code: ${event.code}. Raison: ${event.reason}`);
+                // Code 1006 est un échec de connexion (symbole inconnu, bloqué, ou fermeture anormale)
+                if (event.code === 1006 || event.reason.includes('non trouvé')) {
+                    document.getElementById('display-current-price').innerText = `[ÉCHEC] Symbole (${symbol}) non trouvé sur Binance.`;
+                } else if (event.code !== 1000) {
+                     document.getElementById('display-current-price').innerText = `Déconnecté (${event.code}). Vérifiez la console.`;
+                }
+            };
+        }
+        
+        // Gère le chargement d'un nouveau symbole
+        function loadNewSymbol(newSymbol) {
+            currentSymbol = newSymbol.replace('BINANCE:', ''); 
+            localStorage.setItem('lastSymbol', currentSymbol);
+            const theme = document.documentElement.getAttribute('data-theme');
+            
+            startWebSocket(currentSymbol); // Démarre la lecture du prix en temps réel (le plus critique)
+            
+            // Rechargement du widget TradingView
+            setTimeout(() => {
+                initWidget(theme, currentSymbol); 
+            }, 50); 
+        }
+
+
+        document.getElementById('load-symbol-btn').addEventListener('click', () => {
+            const val = document.getElementById('symbol-input').value.toUpperCase();
+            if(val) {
+                loadNewSymbol(val); 
+            }
+        });
+
+        // --- SIMULATEUR DE TRADING (Reste inchangé) ---
+        const defaultSimData = { balance: 10000, positions: [] };
+        let simData = JSON.parse(localStorage.getItem('tradeLingoSim')) || defaultSimData;
+
+        function updateSimUI() {
+            document.getElementById('sim-balance').innerText = simData.balance.toLocaleString('fr-FR', { style: 'currency', currency: 'USD' });
+            updateFloatingPnlUI(); 
+        }
+
+        function updateFloatingPnlUI() {
+            const tbody = document.getElementById('positions-body');
+            tbody.innerHTML = '';
+
+            if (simData.positions.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:var(--text-secondary);">Aucune position ouverte</td></tr>';
+                return;
+            }
+            
+            if (currentPrice === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:var(--text-secondary);">Connexion au prix en cours...</td></tr>';
+                return;
+            }
+
+
+            simData.positions.forEach((pos, index) => {
+                let pnlAmount = 0;
+                let pnlPercent = 0;
+                
+                if (pos.type === 'buy') {
+                    pnlPercent = (currentPrice - pos.entryPrice) / pos.entryPrice;
+                } else { // 'sell' (short)
+                    pnlPercent = (pos.entryPrice - currentPrice) / pos.entryPrice;
+                }
+                pnlAmount = pos.size * pnlPercent;
+
+                const pnlDisplayClass = pnlAmount >= 0 ? 'pl-green' : 'pl-red';
+                const pnlText = pnlAmount.toFixed(2) + ' $ (' + (pnlPercent * 100).toFixed(2) + '%)';
+                
+                const row = document.createElement('tr');
+                const typeColor = pos.type === 'buy' ? 'var(--green)' : 'var(--red)';
+                const typeLabel = pos.type === 'buy' ? 'LONG 🟢' : 'SHORT 🔴';
+                
+                row.innerHTML = `
+                    <td style="font-weight:bold;">${pos.symbol}</td>
+                    <td style="color:${typeColor}; font-weight:bold;">${typeLabel}</td>
+                    <td>${pos.entryPrice.toFixed(2)} $</td>
+                    <td class="${pnlDisplayClass}">${pnlText}</td> 
+                    <td>${pos.size.toFixed(2)} $</td>
+                    <td>
+                        <button class="action-btn btn-blue btn-small" onclick="closePositionPrompt(${index})">Clôturer</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function executeTrade(type) {
+            const amountInput = document.getElementById('trade-amount');
+            const amount = parseFloat(amountInput.value);
+            
+            if (currentPrice === 0) {
+                 alert("Le prix actuel n'est pas encore chargé. Veuillez patienter ou vérifier si le symbole est valide (ex: BTCUSDT).");
+                 return;
+            }
+
+            if (!amount || amount <= 0) {
+                alert("Veuillez entrer un montant valide.");
+                return;
+            }
+            if (amount > simData.balance * 2) { 
+                alert("Taille de position trop grande. Investissez moins.");
+                return;
+            }
+            
+            const newPosition = {
+                symbol: currentSymbol,
+                type: type, 
+                entryPrice: currentPrice, 
+                size: amount,
+                timestamp: new Date().toISOString()
+            };
+
+            simData.positions.push(newPosition);
+            saveSimData();
+            
+            amountInput.value = '';
+            
+            updateSimUI();
+            alert(`Ordre ${type.toUpperCase()} de ${amount.toFixed(2)}$ exécuté à ${currentPrice.toFixed(2)}$.`);
+        }
+
+        function closePositionPrompt(index) {
+            const pos = simData.positions[index];
+            const defaultPrice = currentPrice.toFixed(2);
+
+            const currentPriceStr = prompt(`Fermeture de ${pos.symbol} (${pos.type.toUpperCase()}).\nEntrée : ${pos.entryPrice.toFixed(2)} $\n\nEntrez le prix de CLÔTURE (Prix actuel: ${defaultPrice} $) :`, defaultPrice);
+            
+            if (currentPriceStr) {
+                const exitPrice = parseFloat(currentPriceStr);
+                if (isNaN(exitPrice)) { alert("Prix invalide"); return; }
+                
+                closePosition(index, exitPrice);
+            }
+        }
+
+        function closePosition(index, exitPrice) {
+            const pos = simData.positions[index];
+            let pnlPercent = 0;
+            
+            if (pos.type === 'buy') {
+                pnlPercent = (exitPrice - pos.entryPrice) / pos.entryPrice;
+            } else {
+                pnlPercent = (pos.entryPrice - exitPrice) / pos.entryPrice;
+            }
+            
+            const pnlAmount = pos.size * pnlPercent;
+            simData.balance += pnlAmount; 
+            
+            simData.positions.splice(index, 1);
+            saveSimData();
+            updateSimUI();
+            
+            const msg = pnlAmount >= 0 ? "Gagné ! 🤑" : "Perdu... 📉";
+            alert(`${msg}\nRésultat : ${pnlAmount.toFixed(2)} $`);
+        }
+
+        function saveSimData() {
+            localStorage.setItem('tradeLingoSim', JSON.stringify(simData));
+        }
+
+
+        // --- THEME & INITIALISATION ---
+        function toggleTheme() {
+            const html = document.documentElement;
+            const current = html.getAttribute('data-theme');
+            const target = current === 'dark' ? 'light' : 'dark';
+            
+            html.setAttribute('data-theme', target);
+            localStorage.setItem('themeMode', target === 'dark' ? 'dark-mode' : 'light-mode');
+            
+            // Recharger le widget avec un léger délai
+            setTimeout(() => {
+                initWidget(target, currentSymbol);
+            }, 50);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // 1. Charger Thème
+            const savedMode = localStorage.getItem('themeMode') || 'light-mode';
+            const themeAttr = savedMode === 'dark-mode' ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', themeAttr);
+            
+            // 2. Charger Stats
+            updateStatsUI();
+            
+            // 3. Charger Widget & Démarrer le WebSocket
+            currentSymbol = currentSymbol.replace('BINANCE:', ''); 
+            document.getElementById('symbol-input').value = currentSymbol;
+            
+            initWidget(themeAttr, currentSymbol);
+            startWebSocket(currentSymbol); 
+
+            // 4. Charger Sim
+            updateSimUI();
+        });
+
+    </script>
 </body>
 </html>
