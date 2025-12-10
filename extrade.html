@@ -95,6 +95,7 @@
         .btn-blue { background-color: var(--blue); }
         .btn-green { background-color: var(--green); }
         .btn-red { background-color: var(--red); }
+        .btn-small { padding: 5px 10px; font-size: 0.8rem; } /* Ajout du style small pour le bouton de réinitialisation */
 
         /* --- 4. Container TradingView --- */
         .tradingview-widget-container {
@@ -133,8 +134,7 @@
         th { color: var(--text-secondary); font-size: 0.9rem; }
         .pl-green { color: var(--green); font-weight: bold; }
         .pl-red { color: var(--red); font-weight: bold; }
-        .btn-small { padding: 5px 10px; font-size: 0.8rem; }
-
+        
         /* --- 6. Footer Nav (Identique) --- */
         .footer {
             position: fixed; bottom: 0; left: 0; width: 100%;
@@ -190,7 +190,13 @@
                 <h3>Simulateur de Trading</h3>
                 <p style="margin:0; font-size:0.9rem;">Entraînez-vous sans risque (Capital Virtuel)</p>
             </div>
-            <div class="balance-display" id="sim-balance">10,000 $</div>
+            <!-- Changement de structure pour inclure le bouton de réinitialisation -->
+            <div style="display: flex; flex-direction: column; align-items: flex-end;"> 
+                <div class="balance-display" id="sim-balance">10,000 $</div>
+                <button onclick="resetSimulatorPrompt()" class="action-btn btn-blue btn-small" style="margin-top: 5px;">
+                    Réinitialiser Capital
+                </button>
+            </div>
         </div>
 
         <div class="trade-controls">
@@ -398,11 +404,13 @@
             }
         });
 
-        // --- SIMULATEUR DE TRADING (Reste inchangé) ---
+        // --- SIMULATEUR DE TRADING (Ajout des fonctions de réinitialisation) ---
+        // Le montant par défaut pour la réinitialisation est 10000.
         const defaultSimData = { balance: 10000, positions: [] };
         let simData = JSON.parse(localStorage.getItem('tradeLingoSim')) || defaultSimData;
 
         function updateSimUI() {
+            // Utilise 'fr-FR' pour le formatage monétaire
             document.getElementById('sim-balance').innerText = simData.balance.toLocaleString('fr-FR', { style: 'currency', currency: 'USD' });
             updateFloatingPnlUI(); 
         }
@@ -459,6 +467,8 @@
             const amount = parseFloat(amountInput.value);
             
             if (currentPrice === 0) {
+                 // Remplacer l'alert() par une boite de message custom ou une mise à jour d'UI si l'environnement le permet.
+                 // Pour rester simple ici, j'utilise alert() car la modification est minimale.
                  alert("Le prix actuel n'est pas encore chargé. Veuillez patienter ou vérifier si le symbole est valide (ex: BTCUSDT).");
                  return;
             }
@@ -526,6 +536,53 @@
 
         function saveSimData() {
             localStorage.setItem('tradeLingoSim', JSON.stringify(simData));
+        }
+
+        /**
+         * Demande à l'utilisateur un montant et réinitialise le simulateur.
+         */
+        function resetSimulatorPrompt() {
+            // Le solde par défaut (10000$) est défini dans defaultSimData
+            const defaultResetAmount = defaultSimData.balance; 
+            
+            // Utilisation d'un prompt pour demander le nouveau montant
+            const newBalanceStr = prompt(
+                `Veuillez entrer le nouveau capital pour la réinitialisation :\n(Laisser vide pour la valeur par défaut : ${defaultResetAmount} $).`, 
+                defaultResetAmount
+            );
+
+            if (newBalanceStr !== null) { // Vérifie si l'utilisateur n'a pas annulé
+                let newBalance = parseFloat(newBalanceStr);
+                
+                // Si l'entrée est vide ou non un nombre valide, utilise le montant par défaut
+                if (isNaN(newBalance) || newBalance <= 0) {
+                     newBalance = defaultResetAmount;
+                }
+                
+                resetSimulator(newBalance);
+            }
+        }
+        
+        /**
+         * Réinitialise le simulateur au solde spécifié et ferme les positions.
+         */
+        function resetSimulator(amount) {
+            // Remplacer le confirm() par une boite de message custom ou une mise à jour d'UI si l'environnement le permet.
+            if (!confirm(`Êtes-vous sûr de vouloir réinitialiser le compte à ${amount.toLocaleString('fr-FR', { style: 'currency', currency: 'USD' })} ?\nToutes les positions ouvertes seront fermées sans P&L calculé.`)) {
+                return;
+            }
+            
+            // 1. Réinitialiser les données
+            simData.balance = amount;
+            simData.positions = []; // Ferme toutes les positions ouvertes
+            
+            // 2. Sauvegarder
+            saveSimData();
+            
+            // 3. Mettre à jour l'interface utilisateur
+            updateSimUI();
+            
+            alert(`Compte de simulation réinitialisé à ${amount.toLocaleString('fr-FR', { style: 'currency', currency: 'USD' })}.`);
         }
 
 
