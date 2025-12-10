@@ -352,7 +352,7 @@
                         const precision = latestPrice > 1 ? 2 : 4; 
                         document.getElementById('display-current-price').innerText = currentPrice.toFixed(precision) + ' $';
                         
-                        updateFloatingPnlUI(); 
+                        updateFloatingPnlUI(); // Mettre à jour l'UI P&L avec le nouveau prix
                     }
                 } else if (data && data.e === 'error') {
                      // Binance envoie parfois une erreur si le symbole n'existe pas
@@ -415,6 +415,10 @@
             updateFloatingPnlUI(); 
         }
 
+        /**
+         * Met à jour le P&L flottant pour toutes les positions.
+         * N'utilise le prix en temps réel que pour le symbole ACTUELLEMENT CHARGÉ.
+         */
         function updateFloatingPnlUI() {
             const tbody = document.getElementById('positions-body');
             tbody.innerHTML = '';
@@ -424,26 +428,41 @@
                 return;
             }
             
-            if (currentPrice === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:var(--text-secondary);">Connexion au prix en cours...</td></tr>';
-                return;
-            }
-
-
             simData.positions.forEach((pos, index) => {
                 let pnlAmount = 0;
                 let pnlPercent = 0;
+                let pnlText = 'N/A';
+                let pnlDisplayClass = '';
                 
-                if (pos.type === 'buy') {
-                    pnlPercent = (currentPrice - pos.entryPrice) / pos.entryPrice;
-                } else { // 'sell' (short)
-                    pnlPercent = (pos.entryPrice - currentPrice) / pos.entryPrice;
-                }
-                pnlAmount = pos.size * pnlPercent;
+                // VÉRIFICATION CRITIQUE: On calcule le P&L flottant UNIQUEMENT
+                // si la position correspond au symbole actuellement suivi (currentSymbol)
+                // et si le prix (currentPrice) est bien chargé.
+                if (pos.symbol === currentSymbol && currentPrice !== 0) {
+                    const priceToUse = currentPrice;
+                    
+                    if (pos.type === 'buy') {
+                        // LONG: (Prix Sortie - Prix Entrée) / Prix Entrée
+                        pnlPercent = (priceToUse - pos.entryPrice) / pos.entryPrice;
+                    } else { 
+                        // SHORT: (Prix Entrée - Prix Sortie) / Prix Entrée
+                        pnlPercent = (pos.entryPrice - priceToUse) / pos.entryPrice;
+                    }
+                    
+                    pnlAmount = pos.size * pnlPercent;
 
-                const pnlDisplayClass = pnlAmount >= 0 ? 'pl-green' : 'pl-red';
-                const pnlText = pnlAmount.toFixed(2) + ' $ (' + (pnlPercent * 100).toFixed(2) + '%)';
-                
+                    pnlDisplayClass = pnlAmount >= 0 ? 'pl-green' : 'pl-red';
+                    pnlText = pnlAmount.toFixed(2) + ' $ (' + (pnlPercent * 100).toFixed(2) + '%)';
+                } else {
+                    // Si le symbole ne correspond pas, affiche un message d'information.
+                    const infoText = (pos.symbol === currentSymbol) 
+                        ? 'Prix en attente...' 
+                        : `(${pos.symbol}) Prix non suivi`;
+
+                    pnlText = `<span style="color:var(--text-secondary); font-weight:normal;">${infoText}</span>`;
+                    pnlDisplayClass = '';
+                }
+
+
                 const row = document.createElement('tr');
                 const typeColor = pos.type === 'buy' ? 'var(--green)' : 'var(--red)';
                 const typeLabel = pos.type === 'buy' ? 'LONG 🟢' : 'SHORT 🔴';
@@ -501,9 +520,13 @@
 
         function closePositionPrompt(index) {
             const pos = simData.positions[index];
-            const defaultPrice = currentPrice.toFixed(2);
+            
+            // Utiliser le prix actuel si la position correspond au symbole suivi, sinon utiliser le prix d'entrée par défaut
+            const defaultPrice = (pos.symbol === currentSymbol && currentPrice !== 0) 
+                ? currentPrice.toFixed(2) 
+                : pos.entryPrice.toFixed(2); // Option de repli si le prix n'est pas suivi
 
-            const currentPriceStr = prompt(`Fermeture de ${pos.symbol} (${pos.type.toUpperCase()}).\nEntrée : ${pos.entryPrice.toFixed(2)} $\n\nEntrez le prix de CLÔTURE (Prix actuel: ${defaultPrice} $) :`, defaultPrice);
+            const currentPriceStr = prompt(`Fermeture de ${pos.symbol} (${pos.type.toUpperCase()}).\nEntrée : ${pos.entryPrice.toFixed(2)} $\n\nEntrez le prix de CLÔTURE (Prix actuel du suivi : ${defaultPrice} $) :`, defaultPrice);
             
             if (currentPriceStr) {
                 const exitPrice = parseFloat(currentPriceStr);
@@ -542,7 +565,7 @@
          * Demande à l'utilisateur un montant et réinitialise le simulateur.
          */
         function resetSimulatorPrompt() {
-            // Le solde par défaut (10000$) est défini dans defaultSimData
+            // Le montant par défaut (10000$) est défini dans defaultSimData
             const defaultResetAmount = defaultSimData.balance; 
             
             // Utilisation d'un prompt pour demander le nouveau montant
