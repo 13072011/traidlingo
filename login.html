@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enregistrement Utilisateur Firestore</title>
+    <!-- Chargement de Tailwind CSS pour un style rapide et moderne -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-start justify-center p-4">
+
+    <div class="w-full max-w-3xl bg-white shadow-xl rounded-xl p-8 mt-10">
+        <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">Mini-Site d'Enregistrement</h1>
+        <p class="text-sm text-center text-red-600 bg-red-50 p-3 rounded-lg mb-6">
+            ⚠️ Attention : Pour des raisons de sécurité et d'éducation, seul le pseudonyme est enregistré dans la base de données. Les mots de passe ne doivent jamais être stockés en texte clair dans une application réelle.
+        </p>
+
+        <!-- Formulaire d'Enregistrement -->
+        <div class="mb-8 p-6 border border-indigo-200 rounded-lg bg-indigo-50">
+            <h2 class="text-xl font-semibold text-indigo-800 mb-4">1. Enregistrer un Nouvel Utilisateur</h2>
+            <form id="registrationForm" class="space-y-4">
+                <div>
+                    <label for="pseudo" class="block text-sm font-medium text-gray-700">Pseudonyme</label>
+                    <input type="text" id="pseudo" name="pseudo" required
+                           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                </div>
+                <div>
+                    <label for="password" class="block text-sm font-medium text-gray-700">Mot de Passe (Non enregistré)</label>
+                    <input type="password" id="password" name="password" required
+                           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                </div>
+                <button type="submit" id="submitButton"
+                        class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out">
+                    Enregistrer le Pseudonyme
+                </button>
+            </form>
+            <p id="messageArea" class="mt-4 text-center"></p>
+        </div>
+
+        <!-- Liste des Utilisateurs Enregistrés -->
+        <div class="p-6 border border-gray-200 rounded-lg bg-white">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">2. Utilisateurs Enregistrés (Mise à jour en temps réel)</h2>
+            <div class="mb-4 text-sm text-gray-600">
+                <p>Votre ID utilisateur (pour le stockage privé) : <code id="userIdDisplay" class="font-mono text-xs bg-gray-100 p-1 rounded">Chargement...</code></p>
+            </div>
+            <ul id="usersList" class="space-y-2">
+                <li class="text-gray-500 italic">Chargement des données...</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Firebase Imports and Setup -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, addDoc, onSnapshot, collection, query, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // --- Configuration Firebase ---
+        // Les variables globales sont fournies par l'environnement Canvas
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        let app, db, auth;
+        let userId = null;
+        let isAuthReady = false;
+
+        const messageArea = document.getElementById('messageArea');
+        const usersList = document.getElementById('usersList');
+        const userIdDisplay = document.getElementById('userIdDisplay');
+
+        // Fonction d'aide pour afficher les messages
+        function displayMessage(message, type = 'success') {
+            messageArea.textContent = message;
+            messageArea.className = `mt-4 text-center p-2 rounded-md ${type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`;
+        }
+
+        // --- 1. Initialisation et Authentification Firebase ---
+        try {
+            app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+            auth = getAuth(app);
+
+            // Gérer l'état d'authentification et les actions une fois connecté
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    userId = user.uid;
+                    isAuthReady = true;
+                    userIdDisplay.textContent = userId;
+                    // Lancer le chargement des données une fois authentifié
+                    setupRealtimeListener();
+                } else {
+                    isAuthReady = false;
+                    userId = null;
+                    userIdDisplay.textContent = 'Non authentifié. Connexion en cours...';
+                }
+            });
+
+            // Tentative de connexion avec le jeton personnalisé ou anonymement
+            if (initialAuthToken) {
+                signInWithCustomToken(auth, initialAuthToken).catch(e => {
+                    console.error("Erreur de connexion avec le jeton personnalisé. Tentative de connexion anonyme.", e);
+                    signInAnonymously(auth);
+                });
+            } else {
+                signInAnonymously(auth);
+            }
+
+        } catch (error) {
+            console.error("Erreur lors de l'initialisation de Firebase:", error);
+            displayMessage("Erreur d'initialisation de la base de données. Vérifiez la console.", 'error');
+        }
+
+        // --- 2. Fonction d'enregistrement des données ---
+        document.getElementById('registrationForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            if (!isAuthReady) {
+                displayMessage("Authentification en cours. Veuillez réessayer.", 'error');
+                return;
+            }
+
+            const pseudoInput = document.getElementById('pseudo');
+            const passwordInput = document.getElementById('password');
+            const pseudo = pseudoInput.value.trim();
+            const password = passwordInput.value;
+
+            if (!pseudo || !password) {
+                displayMessage("Veuillez remplir tous les champs.", 'error');
+                return;
+            }
+
+            // Définition du chemin de la collection publique
+            // Chemin : /artifacts/{appId}/public/data/users_registrations
+            const collectionPath = `artifacts/${appId}/public/data/users_registrations`;
+            const usersCollectionRef = collection(db, collectionPath);
+
+            try {
+                // Création de l'objet de données à enregistrer
+                const newRegistration = {
+                    pseudonyme: pseudo,
+                    // IMPORTANT: Le mot de passe est ignoré ici.
+                    // En production, il faudrait le hacher (ex: bcrypt) et l'enregistrer.
+                    enregistrePar: userId,
+                    timestamp: serverTimestamp() // Ajoute l'heure du serveur
+                };
+
+                // Utilisation de addDoc pour ajouter un nouveau document
+                await addDoc(usersCollectionRef, newRegistration);
+
+                displayMessage(`Pseudonyme '${pseudo}' enregistré avec succès dans Firestore !`);
+                // Réinitialiser le formulaire (sauf le mot de passe pour des raisons pratiques de test)
+                pseudoInput.value = '';
+
+            } catch (e) {
+                console.error("Erreur lors de l'ajout du document:", e);
+                displayMessage("Erreur lors de l'enregistrement. Voir la console pour les détails.", 'error');
+            }
+        });
+
+        // --- 3. Écoute en temps réel des utilisateurs enregistrés ---
+        function setupRealtimeListener() {
+            if (!db || !isAuthReady) return;
+
+            // Définition du même chemin de collection
+            const collectionPath = `artifacts/${appId}/public/data/users_registrations`;
+            const usersCollectionRef = collection(db, collectionPath);
+            const q = query(usersCollectionRef); // On peut ajouter des clauses (ex: where, orderBy) ici
+
+            // onSnapshot écoute les changements en temps réel
+            onSnapshot(q, (snapshot) => {
+                usersList.innerHTML = ''; // Vider la liste actuelle
+                let listContent = '';
+
+                if (snapshot.empty) {
+                    listContent = '<li class="text-gray-500 italic">Aucun utilisateur enregistré pour l\'instant.</li>';
+                } else {
+                    snapshot.forEach((doc) => {
+                        const userData = doc.data();
+                        const pseudo = userData.pseudonyme || 'N/A';
+                        const docId = doc.id;
+                        const savedBy = userData.enregistrePar === userId ? '(Vous)' : '';
+
+                        listContent += `
+                            <li class="flex justify-between items-center p-3 bg-gray-50 rounded-md shadow-sm border border-gray-100">
+                                <span class="text-lg font-medium text-gray-800">${pseudo} ${savedBy}</span>
+                                <span class="text-xs text-gray-500 font-mono">ID Doc: ${docId}</span>
+                            </li>
+                        `;
+                    });
+                }
+                usersList.innerHTML = listContent;
+            }, (error) => {
+                console.error("Erreur lors de l'écoute en temps réel:", error);
+                usersList.innerHTML = '<li class="text-red-500">Erreur lors du chargement des utilisateurs.</li>';
+            });
+        }
+
+        // Lancer le listener une fois que l'authentification est prête (géré par onAuthStateChanged)
+    </script>
+</body>
+</html>
