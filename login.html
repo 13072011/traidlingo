@@ -48,7 +48,7 @@
         <div class="p-6 border border-gray-200 rounded-lg bg-white">
             <h2 class="text-xl font-semibold text-gray-800 mb-4">2. Utilisateurs Enregistrés (Mise à jour en temps réel)</h2>
             <div class="mb-4 text-sm text-gray-600">
-                <p>Votre ID utilisateur (pour le stockage privé) : <code id="userIdDisplay" class="font-mono text-xs bg-gray-100 p-1 rounded">Chargement...</code></p>
+                <p>Votre ID utilisateur (anonyme) : <code id="userIdDisplay" class="font-mono text-xs bg-gray-100 p-1 rounded">Chargement...</code></p>
             </div>
             <ul id="usersList" class="space-y-2">
                 <li class="text-gray-500 italic">Chargement des données...</li>
@@ -62,11 +62,28 @@
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, addDoc, onSnapshot, collection, query, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // --- Configuration Firebase ---
-        // Les variables globales sont fournies par l'environnement Canvas
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        // --- ATTENTION: CONFIGURATION FIREBASE À METTRE À JOUR MANUELLEMENT ---
+        // Lorsque vous déployez ce code sur GitHub ou ailleurs, les variables globales (commentées ci-dessous)
+        // ne sont plus disponibles. Vous DEVEZ utiliser votre propre configuration de projet Firebase.
+
+        // 1. OBTENEZ VOTRE CONFIGURATION : Créez un projet sur la console Firebase
+        //    et copiez les clés d'initialisation de votre application Web (Web app).
+
+        // 2. MODIFIEZ L'OBJET CI-DESSOUS avec vos clés réelles.
+        const firebaseConfig = {
+             apiKey: "AIzaSyDokPbtOP4QgslzQ-07469fKSWi7CCGTlg",
+             authDomain: "data-e1b2d.firebaseapp.com",
+             projectId: "data-e1b2d", // Le 'projectId' est essentiel et était manquant !
+             storageBucket: "data-e1b2d.firebasestorage.app",
+             messagingSenderId: "35809352946",
+             appId: "1:35809352946:web:344b2b4b163cdebc24046b"
+        };
+        const customAppId = "votre_app_id_pour_la_collection_github"; // Utilisé pour définir le chemin de la collection
+        
+        // Les lignes suivantes sont pour l'environnement Canvas uniquement et sont maintenant désactivées pour le déploiement sur GitHub.
+        // const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        // const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+        // const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
         let app, db, auth;
         let userId = null;
@@ -84,9 +101,18 @@
 
         // --- 1. Initialisation et Authentification Firebase ---
         try {
+            // Tenter d'initialiser avec la configuration statique (votre configuration réelle)
             app = initializeApp(firebaseConfig);
             db = getFirestore(app);
             auth = getAuth(app);
+            
+            // Sur GitHub Pages, nous allons utiliser une connexion anonyme par défaut car il n'y a pas de jeton personnalisé.
+            // Le jeton personnalisé n'est plus utilisé ici.
+            signInAnonymously(auth).catch(e => {
+                console.error("Erreur de connexion anonyme à Firebase.", e);
+                displayMessage("Erreur : Impossible de se connecter à l'authentification Firebase.", 'error');
+            });
+
 
             // Gérer l'état d'authentification et les actions une fois connecté
             onAuthStateChanged(auth, (user) => {
@@ -99,23 +125,13 @@
                 } else {
                     isAuthReady = false;
                     userId = null;
-                    userIdDisplay.textContent = 'Non authentifié. Connexion en cours...';
+                    userIdDisplay.textContent = 'Non authentifié. Connexion échouée.';
                 }
             });
 
-            // Tentative de connexion avec le jeton personnalisé ou anonymement
-            if (initialAuthToken) {
-                signInWithCustomToken(auth, initialAuthToken).catch(e => {
-                    console.error("Erreur de connexion avec le jeton personnalisé. Tentative de connexion anonyme.", e);
-                    signInAnonymously(auth);
-                });
-            } else {
-                signInAnonymously(auth);
-            }
-
         } catch (error) {
-            console.error("Erreur lors de l'initialisation de Firebase:", error);
-            displayMessage("Erreur d'initialisation de la base de données. Vérifiez la console.", 'error');
+            console.error("Erreur lors de l'initialisation de Firebase: Veuillez vérifier si vous avez bien inséré votre configuration Firebase dans le code.", error);
+            displayMessage("Erreur d'initialisation de la base de données. Avez-vous mis à jour les clés de configuration ?", 'error');
         }
 
         // --- 2. Fonction d'enregistrement des données ---
@@ -123,7 +139,7 @@
             e.preventDefault();
 
             if (!isAuthReady) {
-                displayMessage("Authentification en cours. Veuillez réessayer.", 'error');
+                displayMessage("Authentification en cours ou échec. Veuillez vérifier la console.", 'error');
                 return;
             }
 
@@ -138,8 +154,10 @@
             }
 
             // Définition du chemin de la collection publique
-            // Chemin : /artifacts/{appId}/public/data/users_registrations
-            const collectionPath = `artifacts/${appId}/public/data/users_registrations`;
+            // NOTE : Le chemin de la collection DOIT être adapté pour votre projet GitHub,
+            // d'où l'utilisation de `customAppId` pour éviter le chemin spécifique au Canvas.
+            // Chemin : /github_deployments/{customAppId}/public/data/users_registrations
+            const collectionPath = `github_deployments/${customAppId}/public/data/users_registrations`;
             const usersCollectionRef = collection(db, collectionPath);
 
             try {
@@ -147,7 +165,6 @@
                 const newRegistration = {
                     pseudonyme: pseudo,
                     // IMPORTANT: Le mot de passe est ignoré ici.
-                    // En production, il faudrait le hacher (ex: bcrypt) et l'enregistrer.
                     enregistrePar: userId,
                     timestamp: serverTimestamp() // Ajoute l'heure du serveur
                 };
@@ -170,7 +187,7 @@
             if (!db || !isAuthReady) return;
 
             // Définition du même chemin de collection
-            const collectionPath = `artifacts/${appId}/public/data/users_registrations`;
+            const collectionPath = `github_deployments/${customAppId}/public/data/users_registrations`;
             const usersCollectionRef = collection(db, collectionPath);
             const q = query(usersCollectionRef); // On peut ajouter des clauses (ex: where, orderBy) ici
 
@@ -202,8 +219,6 @@
                 usersList.innerHTML = '<li class="text-red-500">Erreur lors du chargement des utilisateurs.</li>';
             });
         }
-
-        // Lancer le listener une fois que l'authentification est prête (géré par onAuthStateChanged)
     </script>
 </body>
 </html>
